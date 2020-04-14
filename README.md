@@ -1,2 +1,9 @@
-# finite-automata
-Graphical interface for designing finite automata
+![demo](https://raw.githubusercontent.com/amirkabiri/finite-automata/master/demo.png "demo")
+
+# Finite Automata
+this is a graphical interface for designing finite automata written in javascript
+
+# Features
+- [x] creating dfa and nfa graphically
+- [ ] convert nfa to dfa
+- [ ] convert nfa to dfa and removing useless states

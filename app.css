@@ -1,0 +1,56 @@
+body{
+    padding:0;
+    margin:0;
+}
+canvas{
+    background:#ddd;
+}
+#tools{
+    position:fixed;
+    right:0;
+    margin:4px 4px 0 0;
+    display:flex;
+    flex-direction:column;
+}
+#tools > *{
+    margin-bottom:4px;
+    text-align:center;
+}
+
+#mode{
+    display:flex;
+    justify-content:space-between;
+}
+#mode > button{
+    width:calc(50% - 2px);
+    opacity:.5;
+}
+#mode > .active{
+    opacity: 1;
+}
+
+#context-menu{
+    user-select: none;
+    display:none;
+    position:fixed;
+    list-style:none;
+    padding:0;
+    margin:0;
+    background:white;
+    width:200px;
+    box-sizing:border-box;
+    padding:5px 0;
+    left:100px;
+    top:100px;
+    box-shadow:2px 2px 5px 0 rgba(0, 0, 0, .2);
+}
+#context-menu > li{
+    width:100%;
+    box-sizing:border-box;
+    padding:3px 20px;
+    cursor:pointer;
+    font-size:14px;
+}
+#context-menu > li:hover{
+    background: rgba(0, 0, 0, .1);
+}
