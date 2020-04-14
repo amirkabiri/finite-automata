@@ -495,7 +495,8 @@ $('#minimizedfa').onclick = function(){
 
     render();
 };
-$('#convert2dfa').onclick = function(){
+$('#convert2dfa').onclick = convert2dfa;
+function convert2dfa(){
     if(dfa.start === null) return alert('there is no start state');
 
     let symbols = prompt('enter symbols without space');
@@ -510,8 +511,9 @@ $('#convert2dfa').onclick = function(){
     let terminals = Object.values(dfa.states).filter(state => state.terminal).map(state => state.name);
 
     for(let state of powerSetOfStates){
-        const name = state.join(',');
+        const name = state.sort().join(',');
         const transitions = Object.fromEntries(symbols.map(symbol => [symbol, []]));
+
         let isTerminal = false;
 
         for(let s of state){
@@ -545,7 +547,7 @@ $('#convert2dfa').onclick = function(){
             x : 30 + Math.random() * (cnv.width - 60),
             y : 30 + Math.random() * (cnv.height - 60),
             terminal : isTerminal,
-            transitions
+            transitions : Object.fromEntries(Object.entries(transitions).map(([symbol, target]) => [symbol, [target.sort().join(',')]]))
         });
     }
 
