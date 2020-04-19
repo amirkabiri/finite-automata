@@ -282,18 +282,22 @@ function State({ name, terminal, x, y, transitions }){
         ctx.strokeStyle = state.moving ? 'black' : 'black';
         ctx.fillStyle = state.moving ? 'black' : 'white';
 
+        if(state.terminal){
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = '#ddd';
+            ctx.arc(state.x, state.y, state.getRadius(), 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
+            ctx.closePath();
+            ctx.restore();
+        }
+
         ctx.beginPath();
         ctx.arc(state.x, state.y, config.state.radius, 0, 2 * Math.PI);
         ctx.fill();
         ctx.stroke();
         ctx.closePath();
-
-        if(state.terminal){
-            ctx.beginPath();
-            ctx.arc(state.x, state.y, state.getRadius(), 0, 2 * Math.PI);
-            ctx.stroke();
-            ctx.closePath();
-        }
 
         ctx.fillStyle = state.moving ? 'white' : 'black';
         ctx.font = '15px Tahoma';
