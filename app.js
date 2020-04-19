@@ -543,7 +543,9 @@ $('#convert2dfa').onclick = function (){
     newDfa.setSymbols(symbols);
     let terminals = Object.values(dfa.states).filter(state => state.terminal).map(state => state.name);
 
+    // find start state in new dfa
     let start = [dfa.start];
+    // check lambda transitions for finding start state
     if('' in dfa.states[dfa.start].transitions){
         const lambdaTransition = dfa.states[dfa.start].transitions[''];
         start = start.concat(lambdaTransition);
@@ -551,21 +553,25 @@ $('#convert2dfa').onclick = function (){
     }
 
     for(let state of powerSetOfStates){
+        // name of new dfa
         const name = state.sort().join(',');
         const transitions = Object.fromEntries(symbols.map(symbol => [symbol, []]));
-
         let isTerminal = false;
 
-        for(let s of state){
-            if(!isTerminal && terminals.includes(s)){
-                isTerminal = true;
-            }
+        // this func finds and fills current state transitions
+        // for following lambda transitions, we need recursive function
+        const fillStateTransitions = (state) => {
+            for(let s of state){
+                if(!isTerminal && terminals.includes(s)){
+                    isTerminal = true;
+                }
 
-            if(dfa.states[s] === undefined) continue;
+                if(dfa.states[s] === undefined) continue;
 
-            s = dfa.states[s];
-            for(let symbol of symbols){
-                if(s.transitions[symbol] !== undefined){
+                s = dfa.states[s];
+                for(let symbol of symbols){
+                    if(s.transitions[symbol] === undefined) continue;
+
                     transitions[symbol] = [
                         ... new Set([
                             ... transitions[symbol],
@@ -573,8 +579,14 @@ $('#convert2dfa').onclick = function (){
                         ])
                     ];
                 }
+
+                // handle lambda transitions
+                if(s.transitions[''] !== undefined){
+                    fillStateTransitions(s.transitions['']);
+                }
             }
-        }
+        };
+        fillStateTransitions(state);
 
         for(let symbol of symbols){
             if(transitions[symbol].length === 0){
