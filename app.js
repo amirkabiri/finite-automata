@@ -36,7 +36,13 @@ function load(){
     }
 }
 function render(cls = true){
-    if(cls) ctx.clearRect(0, 0, cnv.width, cnv.height);
+    // if(cls) ctx.clearRect(0, 0, cnv.width, cnv.height);
+    if(cls) {
+        ctx.save();
+        ctx.fillStyle = '#ddd';
+        ctx.fillRect(0, 0, cnv.width, cnv.height);
+        ctx.restore();
+    }
 
     dfa.render();
 
@@ -465,6 +471,12 @@ $$('#mode > button').forEach(button => button.onclick = function(){
     this.classList.add('active');
     saveMode();
 });
+$('#export-image').onclick = function(){
+    const a = document.createElement('a');
+    a.download = 'export-dfa';
+    a.href = cnv.toDataURL();
+    a.click();
+};
 $('#minimizedfa').onclick = function(){
     for(let target in dfa.states){
         if(dfa.start === target) continue;
@@ -495,8 +507,7 @@ $('#minimizedfa').onclick = function(){
 
     render();
 };
-$('#convert2dfa').onclick = convert2dfa;
-function convert2dfa(){
+$('#convert2dfa').onclick = function (){
     if(dfa.start === null) return alert('there is no start state');
 
     let symbols = prompt('enter symbols without space');
