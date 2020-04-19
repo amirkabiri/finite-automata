@@ -14,5 +14,8 @@ this is a graphical interface for designing finite automata written in javascrip
     - [ ] minimize dfa
 - [x] export dfa as image
 - [x] reset action to remove all states
+- [ ] convert dfa to grammar
+- [ ] create dfa from grammar
+
 # Online Demo
 click [here](https://amirkabiri.github.io/finite-automata/index.html) to show online demo
