@@ -486,8 +486,7 @@ let fa = new FA;
 fa.jsonParse(load());
 render();
 
-
-// prevent opening context menu on custom context menu
+// prevent opening default context menu on custom context menu
 $('#context-menu').oncontextmenu = e => e.preventDefault();
 
 $('#reset').onclick = function(){
@@ -636,6 +635,16 @@ $('#convert2dfa').onclick = function (){
 
 };
 
+window.onkeydown = function(e){
+    if(mode !== 'design' && e.ctrlKey){
+        $('#mode [data-key="design"]').click();
+    }
+};
+window.onkeyup = function(e){
+    if(mode !== 'move' && e.key === 'Control'){
+        $('#mode [data-key="move"]').click();
+    }
+};
 window.onresize = function(){
     cnv.width = window.innerWidth;
     cnv.height = window.innerHeight;
