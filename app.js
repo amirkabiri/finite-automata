@@ -309,6 +309,29 @@ function FA(){
     this.states = {};
     this.symbols = [];
 
+    this.predictSymbols = function(){
+        const symbols = [];
+
+        for(let state in this.states){
+            const { transitions } = this.states[state];
+            for(let symbol in transitions){
+                if(symbol === '') continue;
+
+                symbols.push(symbol);
+            }
+        }
+
+        return symbols;
+    };
+
+    this.getSymbols = function(){
+        const predictedSymbols = this.predictSymbols();
+
+        if(predictedSymbols.length > this.symbols.length) return predictedSymbols;
+
+        return this.symbols;
+    };
+
     this.isDFA = function(){
         for(let name in this.states){
             const { transitions } = this.states[name];
@@ -316,7 +339,7 @@ function FA(){
             // if this state had lambda symbol
             if(transitions[''] !== undefined) return false;
 
-            for(let symbol of this.symbols){
+            for(let symbol of this.getSymbols()){
                 // if with a symbol, was connected to more than one state
                 if(transitions[symbol] === undefined || transitions[symbol].length !== 1){
                     return false;
