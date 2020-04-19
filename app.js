@@ -464,7 +464,9 @@ dfa.jsonParse(load());
 render();
 
 
+// prevent opening context menu on custom context menu
 $('#context-menu').oncontextmenu = e => e.preventDefault();
+
 $('#reset').onclick = function(){
     if(!confirm('Are you sure? everything will be removed')) return;
 
@@ -472,19 +474,28 @@ $('#reset').onclick = function(){
     save();
     render();
 };
+
 $$('#mode > button').forEach(button => button.onclick = function(){
     $$('#mode > button').forEach(button => button.classList.remove('active'));
     mode = this.getAttribute('data-key');
     this.classList.add('active');
     saveMode();
 });
+
 $('#export-image').onclick = function(){
     const a = document.createElement('a');
     a.download = 'export-dfa';
     a.href = cnv.toDataURL();
     a.click();
 };
-$('#minimizedfa').onclick = function(){
+
+$('#minimizedfa').onclick = () => {
+    removeUselessStates();
+};
+
+function removeUselessStates(){
+    let runAgain = false;
+
     for(let target in dfa.states){
         if(dfa.start === target) continue;
 
@@ -509,11 +520,15 @@ $('#minimizedfa').onclick = function(){
 
         if(!isTarget){
             dfa.removeState(target);
+            runAgain = true;
         }
     }
 
+    if(runAgain) return removeUselessStates();
+
     render();
 };
+
 $('#convert2dfa').onclick = function (){
     if(dfa.start === null) return alert('there is no start state');
 
@@ -527,6 +542,13 @@ $('#convert2dfa').onclick = function (){
     dfa.setSymbols(symbols);
     newDfa.setSymbols(symbols);
     let terminals = Object.values(dfa.states).filter(state => state.terminal).map(state => state.name);
+
+    let start = [dfa.start];
+    if('' in dfa.states[dfa.start].transitions){
+        const lambdaTransition = dfa.states[dfa.start].transitions[''];
+        start = start.concat(lambdaTransition);
+        start.sort();
+    }
 
     for(let state of powerSetOfStates){
         const name = state.sort().join(',');
@@ -569,7 +591,7 @@ $('#convert2dfa').onclick = function (){
         });
     }
 
-    newDfa.start = dfa.start;
+    newDfa.start = start.join(',');
     dfa = newDfa;
     render();
 
