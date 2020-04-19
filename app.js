@@ -436,8 +436,8 @@ function powerset(l) {
         if (list.length === 0) {
             return [[]];
         }
-        var head = list.pop();
-        var tailPS = ps(list);
+        let head = list.pop();
+        let tailPS = ps(list);
         return tailPS.concat(tailPS.map(function(e) { return [head].concat(e); }));
     })(l.slice());
 }
@@ -465,6 +465,13 @@ render();
 
 
 $('#context-menu').oncontextmenu = e => e.preventDefault();
+$('#reset').onclick = function(){
+    if(!confirm('Are you sure? everything will be removed')) return;
+
+    dfa = new DFA;
+    save();
+    render();
+};
 $$('#mode > button').forEach(button => button.onclick = function(){
     $$('#mode > button').forEach(button => button.classList.remove('active'));
     mode = this.getAttribute('data-key');
