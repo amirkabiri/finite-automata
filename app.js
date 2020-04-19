@@ -605,6 +605,10 @@ $('#convert2dfa').onclick = function (){
 
     newDfa.start = start.join(',');
     dfa = newDfa;
+
+    // remove useless states which created in convert process
+    removeUselessStates();
+
     render();
 
 };
