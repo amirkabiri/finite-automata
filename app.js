@@ -22,14 +22,14 @@ function loadMode(){
 }
 function save(){
     try{
-        localStorage.dfa = dfa.jsonStringify();
+        localStorage.fa = fa.jsonStringify();
     }catch (e) {
         console.log(e);
     }
 }
 function load(){
     try{
-        return localStorage.dfa || '{}';
+        return localStorage.fa || '{}';
     }catch (e) {
         console.log(e);
         return '{}';
@@ -44,7 +44,7 @@ function render(cls = true){
         ctx.restore();
     }
 
-    dfa.render();
+    fa.render();
 
     return;
     for(let edge in edges){
@@ -92,7 +92,7 @@ function render(cls = true){
         ctx.restore();
     }
 
-    dfa.render();
+    fa.render();
 
     for(let edge in edges){
         const [startI, endI] = edge.split('-');
@@ -189,8 +189,8 @@ function State({ name, terminal, x, y, transitions }){
         for(let symbol in this.transitions) {
             for (let target of this.transitions[symbol]) {
                 // draw lines
-                if(dfa.states[target] === undefined) continue;
-                const state = dfa.states[target];
+                if(fa.states[target] === undefined) continue;
+                const state = fa.states[target];
                 if(lineDrawed[this.name+'-'+state.name] === undefined && lineDrawed[state.name+'-'+this.name] === undefined){
                     lineDrawed[state.name+'-'+this.name] = true;
                     ctx.beginPath();
@@ -241,8 +241,8 @@ function State({ name, terminal, x, y, transitions }){
 
         for(let target in targets) {
             if(this.name === target) continue;
-            if(dfa.states[target] === undefined) continue;
-            const state = dfa.states[target];
+            if(fa.states[target] === undefined) continue;
+            const state = fa.states[target];
             const dx = (state.x - this.x);
             const dy = (state.y - this.y);
             const theta = Math.atan2(dy, dx);
@@ -304,14 +304,14 @@ function State({ name, terminal, x, y, transitions }){
         ctx.restore();
     };
 }
-function DFA(){
+function FA(){
     this.start = null;
     this.states = {};
-    this.symbols = ['a', 'b'];
+    this.symbols = [];
 
     this.isDFA = function(){
         for(let name in this.states){
-            const transitions = this.states[name].transitions;
+            const { transitions } = this.states[name];
 
             // if this state had lambda symbol
             if(transitions[''] !== undefined) return false;
@@ -459,8 +459,8 @@ const config = {
     }
 };
 
-let dfa = new DFA;
-dfa.jsonParse(load());
+let fa = new FA;
+fa.jsonParse(load());
 render();
 
 
@@ -470,7 +470,7 @@ $('#context-menu').oncontextmenu = e => e.preventDefault();
 $('#reset').onclick = function(){
     if(!confirm('Are you sure? everything will be removed')) return;
 
-    dfa = new DFA;
+    fa = new FA;
     save();
     render();
 };
@@ -496,17 +496,17 @@ $('#minimizedfa').onclick = () => {
 function removeUselessStates(){
     let runAgain = false;
 
-    for(let target in dfa.states){
-        if(dfa.start === target) continue;
+    for(let target in fa.states){
+        if(fa.start === target) continue;
 
         let isTarget = false;
 
-        for(let name in dfa.states){
+        for(let name in fa.states){
             let breakMe = false;
             if(name === target) continue;
 
-            for(let symbol in dfa.states[name].transitions){
-                const targets = dfa.states[name].transitions[symbol];
+            for(let symbol in fa.states[name].transitions){
+                const targets = fa.states[name].transitions[symbol];
 
                 if(targets.includes(target)){
                     isTarget = true;
@@ -519,7 +519,7 @@ function removeUselessStates(){
         }
 
         if(!isTarget){
-            dfa.removeState(target);
+            fa.removeState(target);
             runAgain = true;
         }
     }
@@ -530,24 +530,24 @@ function removeUselessStates(){
 };
 
 $('#convert2dfa').onclick = function (){
-    if(dfa.start === null) return alert('there is no start state');
+    if(fa.start === null) return alert('there is no start state');
 
     let symbols = prompt('enter symbols without space');
     if(!symbols) return;
     symbols = [... new Set([... symbols])];
 
-    const stateNames = Object.keys(dfa.states);
+    const stateNames = Object.keys(fa.states);
     const powerSetOfStates = powerset(stateNames);
-    const newDfa = new DFA;
-    dfa.setSymbols(symbols);
+    const newDfa = new FA;
+    fa.setSymbols(symbols);
     newDfa.setSymbols(symbols);
-    let terminals = Object.values(dfa.states).filter(state => state.terminal).map(state => state.name);
+    let terminals = Object.values(fa.states).filter(state => state.terminal).map(state => state.name);
 
     // find start state in new dfa
-    let start = [dfa.start];
+    let start = [fa.start];
     // check lambda transitions for finding start state
-    if('' in dfa.states[dfa.start].transitions){
-        const lambdaTransition = dfa.states[dfa.start].transitions[''];
+    if('' in fa.states[fa.start].transitions){
+        const lambdaTransition = fa.states[fa.start].transitions[''];
         start = start.concat(lambdaTransition);
         start.sort();
     }
@@ -566,9 +566,9 @@ $('#convert2dfa').onclick = function (){
                     isTerminal = true;
                 }
 
-                if(dfa.states[s] === undefined) continue;
+                if(fa.states[s] === undefined) continue;
 
-                s = dfa.states[s];
+                s = fa.states[s];
                 for(let symbol of symbols){
                     if(s.transitions[symbol] === undefined) continue;
 
@@ -604,7 +604,7 @@ $('#convert2dfa').onclick = function (){
     }
 
     newDfa.start = start.join(',');
-    dfa = newDfa;
+    fa = newDfa;
 
     // remove useless states which created in convert process
     removeUselessStates();
@@ -634,14 +634,14 @@ cnv.onmousedown = function({ x, y }){
     contextMenu();
 
     if(mode === 'move'){
-        const states = dfa.findNearestStates(x, y);
+        const states = fa.findNearestStates(x, y);
         if(states.length){
             activeState = states[0].name;
         }
     }
 
     if(mode === 'design'){
-        const states = dfa.findNearestStates(x, y);
+        const states = fa.findNearestStates(x, y);
         if(states.length) {
             activeState = states[0].name;
         }
@@ -649,7 +649,7 @@ cnv.onmousedown = function({ x, y }){
 };
 cnv.onmouseup = function({ x, y }){
     if(mode === 'move' && activeState !== null){
-        const state = dfa.states[activeState];
+        const state = fa.states[activeState];
         state.moving = false;
 
         activeState = null;
@@ -659,9 +659,9 @@ cnv.onmouseup = function({ x, y }){
     }
 
     if(mode === 'design' && activeState !== null){
-        const states = dfa.findNearestStates(x, y);
+        const states = fa.findNearestStates(x, y);
         if(states.length){
-            const start = dfa.states[activeState];
+            const start = fa.states[activeState];
             const target = states[0];
             const symbol = prompt('enter symbol ? for lambda symbol enter nothing and press ok');
 
@@ -674,7 +674,7 @@ cnv.onmouseup = function({ x, y }){
 };
 cnv.onmousemove = function({ x, y }){
     if(mode === 'move' && activeState !== null){
-        const movingState = dfa.states[activeState];
+        const movingState = fa.states[activeState];
 
         movingState.x = x;
         movingState.y = y;
@@ -683,7 +683,7 @@ cnv.onmousemove = function({ x, y }){
     }
 
     if(mode === 'design' && activeState !== null){
-        const beginState = dfa.states[activeState];
+        const beginState = fa.states[activeState];
         ctx.clearRect(0, 0, cnv.width, cnv.height);
 
         ctx.save();
@@ -703,7 +703,7 @@ cnv.oncontextmenu = function(e){
     e.preventDefault();
     const { x, y } = e;
     contextMenuPos = {x, y};
-    const states = dfa.findNearestStates(x, y);
+    const states = fa.findNearestStates(x, y);
 
     if(states.length){
         const state = states[0];
@@ -711,7 +711,7 @@ cnv.oncontextmenu = function(e){
             {
                 text : 'terminal ' + (state.terminal ? 'off' : 'on'),
                 onclick : () => {
-                    const states = dfa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
+                    const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
 
                     if(states.length){
                         const state = states[0];
@@ -726,26 +726,26 @@ cnv.oncontextmenu = function(e){
             },{
                 text : 'rename state',
                 onclick : () => {
-                    const states = dfa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
+                    const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
 
                     if(states.length){
                         const state = states[0];
                         const oldName = state.name;
                         const newName = prompt('enter new name');
 
-                        if(dfa.states[newName] !== undefined){
+                        if(fa.states[newName] !== undefined){
                             alert(newName + ' already exists');
                         }else{
-                            if(dfa.start === oldName){
-                                dfa.start = newName;
+                            if(fa.start === oldName){
+                                fa.start = newName;
                             }
 
-                            dfa.states[newName] = dfa.states[oldName];
-                            dfa.states[newName].name = newName;
-                            delete dfa.states[oldName];
+                            fa.states[newName] = fa.states[oldName];
+                            fa.states[newName].name = newName;
+                            delete fa.states[oldName];
 
-                            for(let key in dfa.states){
-                                const state = dfa.states[key];
+                            for(let key in fa.states){
+                                const state = fa.states[key];
 
                                 if(state.name === oldName){
                                     state.name = newName;
@@ -769,12 +769,12 @@ cnv.oncontextmenu = function(e){
             },{
                 text : 'remove state',
                 onclick : () => {
-                    const states = dfa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
+                    const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
 
                     if(states.length){
                         const state = states[0];
                         try{
-                            dfa.removeState(state.name);
+                            fa.removeState(state.name);
                             save();
                             render();
                         }catch (e) {
@@ -787,15 +787,15 @@ cnv.oncontextmenu = function(e){
             }
         ];
 
-        if(dfa.start !== state.name){
+        if(fa.start !== state.name){
             items.push({
                 text : 'make start point',
                 onclick : () => {
-                    const states = dfa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
+                    const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
 
                     if(states.length){
                         const state = states[0];
-                        dfa.start = state.name;
+                        fa.start = state.name;
 
                         save();
                         render();
@@ -818,7 +818,7 @@ cnv.oncontextmenu = function(e){
                         if(name === null) return;
 
                         try{
-                            dfa.addState({
+                            fa.addState({
                                 name,
                                 x,
                                 y,
