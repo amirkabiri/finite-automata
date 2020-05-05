@@ -12,8 +12,8 @@ const config = {
     }
 };
 
-let fa = new FA;
-fa.jsonParse(load());
+let fa = new FiniteAutomata;
+fa.import(load());
 render();
 
 // prevent opening default context menu on custom context menu

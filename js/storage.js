@@ -15,7 +15,7 @@ function loadMode(){
 }
 function save(){
     try{
-        localStorage.fa = fa.jsonStringify();
+        localStorage.fa = fa.export();
     }catch (e) {
         console.log(e);
     }

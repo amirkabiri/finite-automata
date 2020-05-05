@@ -1,15 +1,16 @@
-class FA{
-    constructor(){
-        this.start = null;
-        this.states = {};
-        this.symbols = [];
+class FiniteAutomata{
+    constructor({ start, states, symbols } = {}){
+        this._start = start || null;
+        this._states = states || {};
+        this._symbols = symbols || [];
     }
 
-    predictSymbols(){
+    // this method predicts symbols from this._states object and returns an array
+    _predictSymbols(){
         const symbols = [];
 
-        for(let state in this.states){
-            const { transitions } = this.states[state];
+        for(let state in this._states){
+            const { transitions } = this._states[state];
             for(let symbol in transitions){
                 if(symbol === '') continue;
 
@@ -20,36 +21,110 @@ class FA{
         return symbols;
     }
 
-    getSymbols(){
-        const predictedSymbols = this.predictSymbols();
+    get start(){
+        return this._start;
+    }
+    set start(start){
+        if(!Object.keys(this._states).includes(start)){
+            throw new Error(start + ' state does not exits in this finite automata');
+        }
 
-        if(predictedSymbols.length > this.symbols.length) return predictedSymbols;
+        this._start = start;
+        return this;
+    }
 
-        return this.symbols;
+    get symbols(){
+        const predictedSymbols = this._predictSymbols();
+
+        if(predictedSymbols.length > this._symbols.length) return predictedSymbols;
+
+        return this._symbols;
+    }
+    set symbols(symbols){
+        if(!Array.isArray(symbols)){
+            throw new Error('symbols should be array');
+        }
+
+        this._symbols = symbols;
+        return this;
+    }
+
+    get states(){
+        return this._states;
+    }
+    set states(states){
+        if(typeof states !== 'object'){
+            throw new Error('states should be object');
+        }
+
+        this._states = states;
+        return this;
     }
 
     isDFA(){
-        for(let name in this.states){
-            const { transitions } = this.states[name];
+        for(let name in this._states){
+            const { transitions } = this._states[name];
 
             // if this state had lambda symbol
+            // return false, that means this is not a dfa
             if(transitions[''] !== undefined) return false;
 
             for(let symbol of this.getSymbols()){
                 // if with a symbol, was connected to more than one state
+                // return false, that means this is not a dfa
                 if(transitions[symbol] === undefined || transitions[symbol].length !== 1){
                     return false;
                 }
             }
         }
 
+        // this is a dfa
         return true;
     }
 
-    renderStart = function(){
-        if(this.states[this.start] === undefined) return;
+    import(json){
+        try{
+            json = JSON.parse(json);
+        }catch (e) {
+            throw new Error('imported string is not a valid json');
+        }
 
-        const state = this.states[this.start];
+        if('states' in json && typeof json.states === 'object'){
+            for(let key in json.states){
+                this._states[key] = new State(json.states[key]);
+            }
+        }
+        if('states' in json && 'start' in json && Object.keys(json.states).includes(json.start)){
+            this._start = json.start;
+        }
+        if('symbols' in json && Array.isArray(json.symbols)){
+            this._symbols = json.symbols;
+        }
+
+        return this;
+    }
+    export(){
+        return JSON.stringify({
+            start : this._start,
+            states : this._states,
+            symbols : this._symbols,
+        });
+    }
+
+    findNearestStates(x, y){
+        return Object.values(this._states).filter(state => {
+            const distance = Math.sqrt(
+                Math.pow(x - state.x, 2) + Math.pow(y - state.y, 2)
+            );
+
+            return distance <= state.getRadius();
+        });
+    }
+
+    _renderStartStateArrow(ctx){
+        if(this._states[this._start] === undefined) return;
+
+        const state = this._states[this._start];
         const y = state.y;
         const x = state.x - state.getRadius();
 
@@ -66,90 +141,55 @@ class FA{
 
         ctx.stroke();
         ctx.closePath();
-    };
+    }
     render(){
-        this.renderStart();
+        this._renderStartStateArrow(ctx);
 
-        for(let name in this.states){
-            this.states[name].renderSelfSymbols();
+        for(let name in this._states){
+            this._states[name].renderSelfSymbols();
         }
 
-        for(let name in this.states){
-            this.states[name].renderSymbols();
+        for(let name in this._states){
+            this._states[name].renderSymbols();
         }
 
-        for(let name in this.states){
-            this.states[name].renderState();
+        for(let name in this._states){
+            this._states[name].renderState();
         }
+
         return this;
     };
-    findNearestStates(x, y){
-        return Object.values(this.states).filter(state => {
-            const distance = Math.sqrt(
-                Math.pow(x - state.x, 2) + Math.pow(y - state.y, 2)
-            );
 
-            return distance <= state.getRadius();
-        });
-    }
-    jsonParse(json){
-        json = JSON.parse(json);
 
-        if('states' in json){
-            for(let key in json.states){
-                this.states[key] = new State(json.states[key]);
-            }
-        }
-        if('start' in json){
-            this.start = json.start;
-        }
-        if('symbols' in json){
-            this.symbols = json.symbols;
-        }
-
-        return this;
-    }
-    jsonStringify(){
-        return JSON.stringify(this);
-    }
     removeState(name){
-        if(this.states[name] === undefined){
+        if(this._states[name] === undefined){
             throw Error(name + ' state not found');
         }
 
-        // if removing state was start point, ...
-        if(name === this.start){
-            this.start = null;
+        // if state was start point, ...
+        if(name === this._start){
+            this._start = null;
         }
 
         // remove symbols from other states to this state
-        for(let key in this.states){
-            const state = this.states[key];
+        for(let key in this._states){
+            const state = this._states[key];
             for(let symbol in state.transitions){
                 state.transitions[symbol] = state.transitions[symbol].filter(target => target !== name);
             }
         }
 
-        delete this.states[name];
+        delete this._states[name];
         return this;
     }
 
     addState(data){
-        if(this.states[data.name] !== undefined){
+        if(this._states[data.name] !== undefined){
             throw Error(data.name + ' state already exits');
         }
 
-        this.states[data.name] = new State(data);
+        this._states[data.name] = new State(data);
 
-        return this;
-    }
-
-    setStates(states = {}){
-        this.states = states;
-        return this;
-    }
-    setSymbols(symbols = []){
-        this.symbols = symbols;
         return this;
     }
 }
