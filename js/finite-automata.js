@@ -142,19 +142,19 @@ class FiniteAutomata{
         ctx.stroke();
         ctx.closePath();
     }
-    render(){
+    render(ctx){
         this._renderStartStateArrow(ctx);
 
         for(let name in this._states){
-            this._states[name].renderSelfSymbols();
+            this._states[name].renderSelfSymbols(ctx);
         }
 
         for(let name in this._states){
-            this._states[name].renderSymbols();
+            this._states[name].renderSymbols(ctx);
         }
 
         for(let name in this._states){
-            this._states[name].renderState();
+            this._states[name].renderState(ctx);
         }
 
         return this;
