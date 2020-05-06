@@ -1,5 +1,17 @@
 function contextMenu(data){
-    const contextMenu = $('#context-menu');
+    let contextMenu = $('#custom-context-menu');
+
+    if(contextMenu === null){
+        const ul = document.createElement('ul');
+        ul.id = 'custom-context-menu';
+        document.body.appendChild(ul);
+
+        // prevent opening default context menu on custom context menu
+        ul.oncontextmenu = e => e.preventDefault();
+
+        contextMenu = ul;
+    }
+
     const { style } = contextMenu;
 
     if(!data) {

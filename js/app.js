@@ -16,9 +16,6 @@ let fa = new FiniteAutomata;
 fa.import(load());
 render();
 
-// prevent opening default context menu on custom context menu
-$('#context-menu').oncontextmenu = e => e.preventDefault();
-
 $('#reset').onclick = function(){
     if(!confirm('Are you sure? everything will be removed')) return;
 

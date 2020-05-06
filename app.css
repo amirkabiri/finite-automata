@@ -29,12 +29,11 @@ canvas{
     opacity: 1;
 }
 
-#context-menu{
+#custom-context-menu{
     user-select: none;
     display:none;
     position:fixed;
     list-style:none;
-    padding:0;
     margin:0;
     background:white;
     width:200px;
@@ -44,13 +43,13 @@ canvas{
     top:100px;
     box-shadow:2px 2px 5px 0 rgba(0, 0, 0, .2);
 }
-#context-menu > li{
+#custom-context-menu > li{
     width:100%;
     box-sizing:border-box;
     padding:3px 20px;
     cursor:pointer;
     font-size:14px;
 }
-#context-menu > li:hover{
+#custom-context-menu > li:hover{
     background: rgba(0, 0, 0, .1);
 }
