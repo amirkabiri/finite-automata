@@ -1,4 +1,4 @@
-function removeUselessStates(){
+function removeUselessStates(fa){
     let runAgain = false;
 
     for(let target in fa.states){
@@ -29,7 +29,7 @@ function removeUselessStates(){
         }
     }
 
-    if(runAgain) return removeUselessStates();
+    if(runAgain) return removeUselessStates(fa);
 
-    render();
+    return fa;
 }
