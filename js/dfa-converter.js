@@ -1,15 +1,20 @@
-function convertNFA2DFA(){
-    if(fa.start === null) return alert('there is no start state');
+function NoStartPointError(message){
+    this.message = message || 'there is no start state';
+}
 
-    let symbols = prompt('enter symbols without space');
-    if(!symbols) return;
-    symbols = [... new Set([... symbols])];
+function convertNFA2DFA(fa){
+    // if it's a dfa, don't need to convert !
+    if(fa.isDFA()) return fa;
+
+    if(fa.start === null || !Object.keys(fa.states).includes(fa.start)){
+        throw new NoStartPointError;
+    }
+
+    const symbols = [... new Set([... fa.symbols])];
 
     const stateNames = Object.keys(fa.states);
     const powerSetOfStates = powerset(stateNames);
-    const newDfa = new FA;
-    fa.setSymbols(symbols);
-    newDfa.setSymbols(symbols);
+    const newFa = new FiniteAutomata({ symbols });
     let terminals = Object.values(fa.states).filter(state => state.terminal).map(state => state.name);
 
     // find start state in new dfa
@@ -63,7 +68,7 @@ function convertNFA2DFA(){
             }
         }
 
-        newDfa.states[name] = new State({
+        newFa.states[name] = new State({
             name,
             x : 30 + Math.random() * (cnv.width - 60),
             y : 30 + Math.random() * (cnv.height - 60),
@@ -72,12 +77,7 @@ function convertNFA2DFA(){
         });
     }
 
-    newDfa.start = start.join(',');
-    fa = newDfa;
+    newFa.start = start.join(',');
 
-    // remove useless states which created in convert process
-    removeUselessStates();
-
-    render();
-
+    return newFa;
 }

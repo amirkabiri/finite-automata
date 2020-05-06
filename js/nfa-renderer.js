@@ -7,7 +7,7 @@ function render(cls = true){
         ctx.restore();
     }
 
-    fa.render();
+    fa.render(ctx);
 
     return;
     for(let edge in edges){

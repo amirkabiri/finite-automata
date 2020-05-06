@@ -43,7 +43,20 @@ $('#minimizedfa').onclick = () => {
 };
 
 $('#convert2dfa').onclick = () => {
-    convertNFA2DFA();
+    let { symbols } = fa;
+    symbols = prompt('enter symbols without space : ', symbols.join(''));
+    if(symbols === null) return;
+    fa.symbols = symbols.split('');
+
+    try{
+        fa = convertNFA2DFA(fa);
+        render();
+    }catch (e) {
+        console.log(e)
+        if(e instanceof NoStartPointError){
+            alert(e.message);
+        }
+    }
 };
 
 window.onkeydown = function(e){

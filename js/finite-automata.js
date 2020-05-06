@@ -69,7 +69,7 @@ class FiniteAutomata{
             // return false, that means this is not a dfa
             if(transitions[''] !== undefined) return false;
 
-            for(let symbol of this.getSymbols()){
+            for(let symbol of this._symbols){
                 // if with a symbol, was connected to more than one state
                 // return false, that means this is not a dfa
                 if(transitions[symbol] === undefined || transitions[symbol].length !== 1){
