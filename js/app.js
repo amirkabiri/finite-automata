@@ -171,6 +171,21 @@ cnv.onmousemove = function({ x, y }){
         render(false);
     }
 };
+function onTransitionRemoveClick(data){
+    const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
+
+    if(states.length){
+        const state = states[0];
+        const [symbol, target] = data.split('-');
+
+        if(symbol in state.transitions && state.transitions[symbol].includes(target)){
+            state.transitions[symbol] = state.transitions[symbol].filter(s => s !== target);
+        }
+    }
+
+    render();
+    contextMenu();
+}
 cnv.oncontextmenu = function(e){
     e.preventDefault();
     const { x, y } = e;
@@ -258,6 +273,23 @@ cnv.oncontextmenu = function(e){
                 }
             }
         ];
+
+        const removeTransitionsMenu = [];
+        for(let symbol in state.transitions){
+            for(let target of state.transitions[symbol]){
+                removeTransitionsMenu.push({
+                    text : `σ({${ state.name }}, ${ symbol === '' ? 'λ' : symbol }) = {${ target }}`,
+                    data : `${ symbol }-${ target }`,
+                    onclick : onTransitionRemoveClick,
+                });
+            }
+        }
+        if(removeTransitionsMenu.length){
+            items.push({
+                text : 'remove transitions',
+                children : removeTransitionsMenu
+            })
+        }
 
         if(fa.start !== state.name){
             items.push({
