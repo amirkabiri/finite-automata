@@ -62,6 +62,19 @@ $('#convert2dfa').onclick = () => {
     }
 };
 
+$('#complement').onclick = () => {
+    try{
+        fa = dfaComplement(fa);
+        render();
+    }catch (e) {
+        if(e instanceof IsNotDeterministicError){
+            alert(e.message);
+        }else{
+            console.log(e);
+        }
+    }
+};
+
 window.onkeydown = function(e){
     if(mode !== 'design' && e.ctrlKey){
         $('#mode [data-key="design"]').click();
@@ -122,7 +135,7 @@ cnv.onmouseup = function({ x, y }){
         if(states.length){
             const start = fa.states[activeState];
             const target = states[0];
-            const symbol = prompt('enter symbol ? for lambda symbol enter nothing and press ok');
+            const symbol = prompt('enter symbol . for lambda symbol enter nothing and press ok');
 
             if(symbol !== null) start.translate(symbol, target.name);
         }
