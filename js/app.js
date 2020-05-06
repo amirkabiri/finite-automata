@@ -52,9 +52,10 @@ $('#convert2dfa').onclick = () => {
         fa = convertNFA2DFA(fa);
         render();
     }catch (e) {
-        console.log(e)
         if(e instanceof NoStartPointError){
             alert(e.message);
+        }else{
+            console.log(e);
         }
     }
 };

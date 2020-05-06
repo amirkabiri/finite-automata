@@ -14,6 +14,8 @@ class FiniteAutomata{
             for(let symbol in transitions){
                 if(symbol === '') continue;
 
+                if(symbols.includes(symbol)) continue;
+
                 symbols.push(symbol);
             }
         }
