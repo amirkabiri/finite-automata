@@ -51,6 +51,7 @@ $('#convert2dfa').onclick = () => {
 
     try{
         fa = convertNFA2DFA(fa);
+        fa = removeUselessStates(fa);
         render();
     }catch (e) {
         if(e instanceof NoStartPointError){
