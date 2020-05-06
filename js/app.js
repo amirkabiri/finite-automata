@@ -19,7 +19,7 @@ render();
 $('#reset').onclick = function(){
     if(!confirm('Are you sure? everything will be removed')) return;
 
-    fa = new FA;
+    fa = new FiniteAutomata;
     save();
     render();
 };
