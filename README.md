@@ -16,7 +16,7 @@ this is a graphical interface for designing finite automata written in javascrip
 - [x] reset action to remove all states
 - [ ] convert dfa to grammar
 - [ ] create dfa from grammar
-- [ ] remove specific transition
+- [x] remove specific transition
 - [ ] make drawing transitions better and more pretty
 
 # Online Demo
