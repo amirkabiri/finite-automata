@@ -137,6 +137,15 @@ function minimizeDFA(dfa){
             });
         }
 
+        // finding start state
+        for(let set of sets){
+            if(set.includes(dfa.start)){
+                set.sort();
+                newDfa.start = set.join(',');
+                break;
+            }
+        }
+
         return newDfa;
     };
     const generateInitSet = dfa => {
