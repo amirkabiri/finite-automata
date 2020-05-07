@@ -39,7 +39,7 @@ $('#export-image').onclick = function(){
 };
 
 $('#minimizedfa').onclick = () => {
-    fa = removeUselessStates(fa);
+    fa = minimizeDFA(fa);
     render();
 };
 
