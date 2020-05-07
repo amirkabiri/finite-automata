@@ -9,9 +9,9 @@ this is a graphical interface for designing finite automata written in javascrip
     - [x] define and send unavailable symbols of every state to trap
     - [x] convert duplicate symbols of every state
     - [x] convert lambda transitions
-- [ ] minimize dfa and removing useless states
+- [x] minimize dfa and removing useless states
     - [x] remove useless states
-    - [ ] minimize dfa
+    - [x] minimize dfa
 - [x] export dfa as image
 - [x] reset action to remove all states
 - [ ] convert dfa to grammar
