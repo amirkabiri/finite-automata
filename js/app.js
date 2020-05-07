@@ -39,8 +39,16 @@ $('#export-image').onclick = function(){
 };
 
 $('#minimizedfa').onclick = () => {
-    fa = minimizeDFA(fa);
-    render();
+    try{
+        fa = minimizeDFA(fa);
+        render();
+    }catch (e) {
+        if(e instanceof IsNotDeterministicError){
+            alert(e.message);
+        }else{
+            console.log(e);
+        }
+    }
 };
 
 $('#convert2dfa').onclick = () => {
