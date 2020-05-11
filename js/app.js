@@ -110,17 +110,17 @@ window.onkeypress = function(e){
             break;
     }
 };
-cnv.onmousedown = function({ x, y }){
+cnv.onmousedown = function({button, x, y }){
     contextMenu();
 
-    if(mode === 'move'){
+    if(mode === 'move' && button !== 2){
         const states = fa.findNearestStates(x, y);
         if(states.length){
             activeState = states[0].name;
         }
     }
 
-    if(mode === 'design'){
+    if(mode === 'design' && button !== 2){
         const states = fa.findNearestStates(x, y);
         if(states.length) {
             activeState = states[0].name;
