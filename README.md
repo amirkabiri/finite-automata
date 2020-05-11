@@ -1,7 +1,10 @@
-![demo](https://raw.githubusercontent.com/amirkabiri/finite-automata/master/demo.png "demo")
+![demo](demo.png "demo")
 
 # Finite Automata
 this is a graphical interface for designing finite automata written in javascript
+
+# Online Demo
+click [here](https://amirkabiri.github.io/finite-automata/index.html) to see online demo
 
 # Tasks
 - [x] creating dfa and nfa graphically
@@ -18,6 +21,4 @@ this is a graphical interface for designing finite automata written in javascrip
 - [ ] create dfa from grammar
 - [x] remove specific transition
 - [ ] make drawing transitions better and more pretty
-
-# Online Demo
-click [here](https://amirkabiri.github.io/finite-automata/index.html) to show online demo
+- [ ] convert nfa to regular expressions
