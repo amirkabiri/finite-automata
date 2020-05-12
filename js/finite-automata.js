@@ -21,8 +21,11 @@ class FiniteAutomata{
         const symbols = [];
 
         for(let state in this._states){
+            if(!this._states.hasOwnProperty(state)) continue;
             const { transitions } = this._states[state];
+
             for(let symbol in transitions){
+                if(!transitions.hasOwnProperty(symbol)) continue;
                 if(symbol === '') continue;
 
                 if(symbols.includes(symbol)) continue;
@@ -78,6 +81,8 @@ class FiniteAutomata{
      */
     isDFA(){
         for(let name in this._states){
+            if(!this._states.hasOwnProperty(name)) continue;
+
             const { transitions } = this._states[name];
 
             // if this state had lambda symbol
@@ -180,14 +185,20 @@ class FiniteAutomata{
         this._renderStartStateArrow(ctx);
 
         for(let name in this._states){
+            if(!this._states.hasOwnProperty(name)) continue;
+
             this._states[name].renderSelfSymbols(ctx);
         }
 
         for(let name in this._states){
+            if(!this._states.hasOwnProperty(name)) continue;
+
             this._states[name].renderSymbols(ctx);
         }
 
         for(let name in this._states){
+            if(!this._states.hasOwnProperty(name)) continue;
+
             this._states[name].renderState(ctx);
         }
 
