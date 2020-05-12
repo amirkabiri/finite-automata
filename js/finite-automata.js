@@ -42,7 +42,7 @@ class FiniteAutomata{
     }
     set start(start){
         if(!Object.keys(this._states).includes(start)){
-            throw new Error(start + ' state does not exits in this finite automata');
+            throw new StateNotFoundError(start + ' state does not exits in this finite automata')
         }
 
         this._start = start;
@@ -57,7 +57,7 @@ class FiniteAutomata{
     }
     set symbols(symbols){
         if(!Array.isArray(symbols)){
-            throw new Error('symbols should be array');
+            throw new SymbolsShouldBeArrayError;
         }
 
         this._symbols = symbols;
@@ -69,7 +69,7 @@ class FiniteAutomata{
     }
     set states(states){
         if(typeof states !== 'object'){
-            throw new Error('states should be object');
+            throw new StatesShouldBeObjectError;
         }
 
         this._states = states;
@@ -112,7 +112,7 @@ class FiniteAutomata{
         try{
             json = JSON.parse(json);
         }catch (e) {
-            throw new Error('imported string is not a valid json');
+            throw new InvalidJsonError('imported string is not a valid json');
         }
 
         if(json.hasOwnProperty('states') && typeof json.states === 'object'){
@@ -213,7 +213,7 @@ class FiniteAutomata{
      */
     removeState(name){
         if(this._states[name] === undefined){
-            throw Error(name + ' state not found');
+            throw new StateNotFoundError(name + ' state not found');
         }
 
         // if state was start point, make this._start null
@@ -244,7 +244,7 @@ class FiniteAutomata{
      */
     addState(data){
         if(this._states[data.name] !== undefined){
-            throw Error(data.name + ' state already exits');
+            throw new StateAlreadyExistsError(data.name + ' state already exits');
         }
 
         this._states[data.name] = new State(data);

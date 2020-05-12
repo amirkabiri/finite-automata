@@ -1,7 +1,3 @@
-function NoStartPointError(message){
-    this.message = message || 'there is no start state';
-}
-
 function convertNFA2DFA(fa){
     // if it's a dfa, don't need to convert !
     if(fa.isDFA()) return fa;
