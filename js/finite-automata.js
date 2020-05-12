@@ -1,11 +1,22 @@
 class FiniteAutomata{
     constructor({ start, states, symbols } = {}){
+        // this variable holds name of state or null
         this._start = start || null;
+
+        // this is an object which keys are state names
+        // and values of the keys are an object of State class
         this._states = states || {};
+
+        // an array of symbols. example : ['a', 'b']
         this._symbols = symbols || [];
     }
 
-    // this method predicts symbols from this._states object and returns an array
+
+    /**
+     * This method predicts used symbols from this._states object and returns an array
+     * @return {Array}
+     * @private
+     */
     _predictSymbols(){
         const symbols = [];
 
@@ -32,7 +43,6 @@ class FiniteAutomata{
         }
 
         this._start = start;
-        return this;
     }
 
     get symbols(){
@@ -60,9 +70,12 @@ class FiniteAutomata{
         }
 
         this._states = states;
-        return this;
     }
 
+    /**
+     * Checking this FiniteAutomata is deterministic or not
+     * @return {boolean}
+     */
     isDFA(){
         for(let name in this._states){
             const { transitions } = this._states[name];
@@ -73,6 +86,7 @@ class FiniteAutomata{
 
             for(let symbol of this._symbols){
                 // if with a symbol, was connected to more than one state
+                // or state has not the symbol in transitions object (is not deterministic)
                 // return false, that means this is not a dfa
                 if(transitions[symbol] === undefined || transitions[symbol].length !== 1){
                     return false;
@@ -84,6 +98,11 @@ class FiniteAutomata{
         return true;
     }
 
+    /**
+     * Used for importing an json string that was saved in localStorage
+     * @param {string} json
+     * @return {FiniteAutomata}
+     */
     import(json){
         try{
             json = JSON.parse(json);
@@ -91,20 +110,27 @@ class FiniteAutomata{
             throw new Error('imported string is not a valid json');
         }
 
-        if('states' in json && typeof json.states === 'object'){
+        if(json.hasOwnProperty('states') && typeof json.states === 'object'){
             for(let key in json.states){
+                if(!json.states.hasOwnProperty(key)) continue;
+
                 this._states[key] = new State(json.states[key]);
             }
         }
-        if('states' in json && 'start' in json && Object.keys(json.states).includes(json.start)){
+        if(json.hasOwnProperty('states') && json.hasOwnProperty('start') && Object.keys(json.states).includes(json.start)){
             this._start = json.start;
         }
-        if('symbols' in json && Array.isArray(json.symbols)){
+        if(json.hasOwnProperty('symbols') && Array.isArray(json.symbols)){
             this._symbols = json.symbols;
         }
 
         return this;
     }
+
+    /**
+     * Export an FiniteAutomata object to save anywhere like localStorage
+     * @return {string}
+     */
     export(){
         return JSON.stringify({
             start : this._start,
@@ -113,6 +139,12 @@ class FiniteAutomata{
         });
     }
 
+    /**
+     * Finding states that their distance from (x, y) is less than their radius
+     * @param {number} x
+     * @param {number} y
+     * @return {array}
+     */
     findNearestStates(x, y){
         return Object.values(this._states).filter(state => {
             const distance = Math.sqrt(
@@ -163,20 +195,29 @@ class FiniteAutomata{
     };
 
 
+    /**
+     * Removing specific state by name
+     * @param {string} name
+     * @return {FiniteAutomata}
+     */
     removeState(name){
         if(this._states[name] === undefined){
             throw Error(name + ' state not found');
         }
 
-        // if state was start point, ...
+        // if state was start point, make this._start null
         if(name === this._start){
             this._start = null;
         }
 
         // remove symbols from other states to this state
         for(let key in this._states){
+            if(!this._states.hasOwnProperty(key)) continue;
+
             const state = this._states[key];
             for(let symbol in state.transitions){
+                if(!state.transitions.hasOwnProperty(symbol)) continue;
+
                 state.transitions[symbol] = state.transitions[symbol].filter(target => target !== name);
             }
         }
@@ -185,6 +226,11 @@ class FiniteAutomata{
         return this;
     }
 
+    /**
+     * takes an simple object and adds this state to the fa
+     * @param {object} data
+     * @return {FiniteAutomata}
+     */
     addState(data){
         if(this._states[data.name] !== undefined){
             throw Error(data.name + ' state already exits');
