@@ -84,7 +84,7 @@ class FiniteAutomata{
             // return false, that means this is not a dfa
             if(transitions[''] !== undefined) return false;
 
-            for(let symbol of this._symbols){
+            for(let symbol of this._predictSymbols()){
                 // if with a symbol, was connected to more than one state
                 // or state has not the symbol in transitions object (is not deterministic)
                 // return false, that means this is not a dfa
