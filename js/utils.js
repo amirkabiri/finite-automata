@@ -17,5 +17,5 @@ function powerset(l) {
     })(l.slice());
 }
 
-window.$ = (...q) => document.querySelector(q);
-window.$$ = (...q) => document.querySelectorAll(q);
+window.$ = (...q) => document.querySelector(...q);
+window.$$ = (...q) => document.querySelectorAll(...q);
