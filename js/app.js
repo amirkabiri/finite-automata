@@ -1,3 +1,12 @@
+
+const welcomeModal = new Modal('welcome-modal', { open : true });
+$('#welcome-modal-skip').onclick = () => welcomeModal.close();
+$('#welcome-modal-tutorial').onclick = () => {
+    welcomeModal.close();
+    introJs().start();
+};
+
+
 let mode = 'move';
 window.onload = () => $('#mode [data-key="' + loadMode() + '"]').click();
 const [cnv, ctx] = createCanvas(innerWidth, innerHeight);
@@ -11,6 +20,7 @@ const config = {
         terminalRadius : 5
     }
 };
+
 
 let fa = new FiniteAutomata;
 fa.import(load());
