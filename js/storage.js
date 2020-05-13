@@ -1,29 +1,29 @@
-function saveMode(){
-    try{
+function saveMode() {
+    try {
         localStorage.mode = mode;
-    }catch (e) {
+    } catch (e) {
         console.log(e);
     }
 }
-function loadMode(){
-    try{
+function loadMode() {
+    try {
         return localStorage.mode || 'move';
-    }catch (e) {
+    } catch (e) {
         console.log(e);
         return 'move';
     }
 }
-function save(){
-    try{
+function save() {
+    try {
         localStorage.fa = fa.export();
-    }catch (e) {
+    } catch (e) {
         console.log(e);
     }
 }
-function load(){
-    try{
+function load() {
+    try {
         return localStorage.fa || '{}';
-    }catch (e) {
+    } catch (e) {
         console.log(e);
         return '{}';
     }

@@ -1,4 +1,4 @@
-function createCanvas(width = 320, height = 160){
+function createCanvas(width = 320, height = 160) {
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
@@ -13,7 +13,11 @@ function powerset(l) {
         }
         let head = list.pop();
         let tailPS = ps(list);
-        return tailPS.concat(tailPS.map(function(e) { return [head].concat(e); }));
+        return tailPS.concat(
+            tailPS.map(function (e) {
+                return [head].concat(e);
+            })
+        );
     })(l.slice());
 }
 

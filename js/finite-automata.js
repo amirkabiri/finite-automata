@@ -1,5 +1,5 @@
-class FiniteAutomata{
-    constructor({ start, states, symbols } = {}){
+class FiniteAutomata {
+    constructor({ start, states, symbols } = {}) {
         // this variable holds name of state or null
         this._start = start || null;
 
@@ -11,24 +11,23 @@ class FiniteAutomata{
         this._symbols = symbols || [];
     }
 
-
     /**
      * This method predicts used symbols from this._states object and returns an array
      * @return {Array}
      * @private
      */
-    _predictSymbols(){
+    _predictSymbols() {
         const symbols = [];
 
-        for(let state in this._states){
-            if(!this._states.hasOwnProperty(state)) continue;
+        for (let state in this._states) {
+            if (!this._states.hasOwnProperty(state)) continue;
             const { transitions } = this._states[state];
 
-            for(let symbol in transitions){
-                if(!transitions.hasOwnProperty(symbol)) continue;
-                if(symbol === '') continue;
+            for (let symbol in transitions) {
+                if (!transitions.hasOwnProperty(symbol)) continue;
+                if (symbol === '') continue;
 
-                if(symbols.includes(symbol)) continue;
+                if (symbols.includes(symbol)) continue;
 
                 symbols.push(symbol);
             }
@@ -37,39 +36,42 @@ class FiniteAutomata{
         return symbols;
     }
 
-    get start(){
+    get start() {
         return this._start;
     }
-    set start(start){
-        if(!Object.keys(this._states).includes(start)){
-            throw new StateNotFoundError(start + ' state does not exits in this finite automata')
+    set start(start) {
+        if (!Object.keys(this._states).includes(start)) {
+            throw new StateNotFoundError(
+                start + ' state does not exits in this finite automata'
+            );
         }
 
         this._start = start;
     }
 
-    get symbols(){
+    get symbols() {
         const predictedSymbols = this._predictSymbols();
 
-        if(predictedSymbols.length > this._symbols.length) return predictedSymbols;
+        if (predictedSymbols.length > this._symbols.length)
+            return predictedSymbols;
 
         return this._symbols;
     }
-    set symbols(symbols){
-        if(!Array.isArray(symbols)){
-            throw new SymbolsShouldBeArrayError;
+    set symbols(symbols) {
+        if (!Array.isArray(symbols)) {
+            throw new SymbolsShouldBeArrayError();
         }
 
         this._symbols = symbols;
         return this;
     }
 
-    get states(){
+    get states() {
         return this._states;
     }
-    set states(states){
-        if(typeof states !== 'object'){
-            throw new StatesShouldBeObjectError;
+    set states(states) {
+        if (typeof states !== 'object') {
+            throw new StatesShouldBeObjectError();
         }
 
         this._states = states;
@@ -79,21 +81,24 @@ class FiniteAutomata{
      * Checking this FiniteAutomata is deterministic or not
      * @return {boolean}
      */
-    isDFA(){
-        for(let name in this._states){
-            if(!this._states.hasOwnProperty(name)) continue;
+    isDFA() {
+        for (let name in this._states) {
+            if (!this._states.hasOwnProperty(name)) continue;
 
             const { transitions } = this._states[name];
 
             // if this state had lambda symbol
             // return false, that means this is not a dfa
-            if(transitions[''] !== undefined) return false;
+            if (transitions[''] !== undefined) return false;
 
-            for(let symbol of this._predictSymbols()){
+            for (let symbol of this._predictSymbols()) {
                 // if with a symbol, was connected to more than one state
                 // or state has not the symbol in transitions object (is not deterministic)
                 // return false, that means this is not a dfa
-                if(transitions[symbol] === undefined || transitions[symbol].length !== 1){
+                if (
+                    transitions[symbol] === undefined ||
+                    transitions[symbol].length !== 1
+                ) {
                     return false;
                 }
             }
@@ -108,24 +113,28 @@ class FiniteAutomata{
      * @param {string} json
      * @return {FiniteAutomata}
      */
-    import(json){
-        try{
+    import(json) {
+        try {
             json = JSON.parse(json);
-        }catch (e) {
+        } catch (e) {
             throw new InvalidJsonError('imported string is not a valid json');
         }
 
-        if(json.hasOwnProperty('states') && typeof json.states === 'object'){
-            for(let key in json.states){
-                if(!json.states.hasOwnProperty(key)) continue;
+        if (json.hasOwnProperty('states') && typeof json.states === 'object') {
+            for (let key in json.states) {
+                if (!json.states.hasOwnProperty(key)) continue;
 
                 this._states[key] = new State(json.states[key]);
             }
         }
-        if(json.hasOwnProperty('states') && json.hasOwnProperty('start') && Object.keys(json.states).includes(json.start)){
+        if (
+            json.hasOwnProperty('states') &&
+            json.hasOwnProperty('start') &&
+            Object.keys(json.states).includes(json.start)
+        ) {
             this._start = json.start;
         }
-        if(json.hasOwnProperty('symbols') && Array.isArray(json.symbols)){
+        if (json.hasOwnProperty('symbols') && Array.isArray(json.symbols)) {
             this._symbols = json.symbols;
         }
 
@@ -136,11 +145,11 @@ class FiniteAutomata{
      * Export an FiniteAutomata object to save anywhere like localStorage
      * @return {string}
      */
-    export(){
+    export() {
         return JSON.stringify({
-            start : this._start,
-            states : this._states,
-            symbols : this._symbols,
+            start: this._start,
+            states: this._states,
+            symbols: this._symbols,
         });
     }
 
@@ -150,7 +159,7 @@ class FiniteAutomata{
      * @param {number} y
      * @return {array}
      */
-    findNearestStates(x, y){
+    findNearestStates(x, y) {
         return Object.values(this._states).filter(state => {
             const distance = Math.sqrt(
                 Math.pow(x - state.x, 2) + Math.pow(y - state.y, 2)
@@ -160,8 +169,8 @@ class FiniteAutomata{
         });
     }
 
-    _renderStartStateArrow(ctx){
-        if(this._states[this._start] === undefined) return;
+    _renderStartStateArrow(ctx) {
+        if (this._states[this._start] === undefined) return;
 
         const state = this._states[this._start];
         const y = state.y;
@@ -181,55 +190,56 @@ class FiniteAutomata{
         ctx.stroke();
         ctx.closePath();
     }
-    render(ctx){
+    render(ctx) {
         this._renderStartStateArrow(ctx);
 
-        for(let name in this._states){
-            if(!this._states.hasOwnProperty(name)) continue;
+        for (let name in this._states) {
+            if (!this._states.hasOwnProperty(name)) continue;
 
             this._states[name].renderSelfSymbols(ctx);
         }
 
-        for(let name in this._states){
-            if(!this._states.hasOwnProperty(name)) continue;
+        for (let name in this._states) {
+            if (!this._states.hasOwnProperty(name)) continue;
 
             this._states[name].renderSymbols(ctx);
         }
 
-        for(let name in this._states){
-            if(!this._states.hasOwnProperty(name)) continue;
+        for (let name in this._states) {
+            if (!this._states.hasOwnProperty(name)) continue;
 
             this._states[name].renderState(ctx);
         }
 
         return this;
-    };
-
+    }
 
     /**
      * Removing specific state by name
      * @param {string} name
      * @return {FiniteAutomata}
      */
-    removeState(name){
-        if(this._states[name] === undefined){
+    removeState(name) {
+        if (this._states[name] === undefined) {
             throw new StateNotFoundError(name + ' state not found');
         }
 
         // if state was start point, make this._start null
-        if(name === this._start){
+        if (name === this._start) {
             this._start = null;
         }
 
         // remove symbols from other states to this state
-        for(let key in this._states){
-            if(!this._states.hasOwnProperty(key)) continue;
+        for (let key in this._states) {
+            if (!this._states.hasOwnProperty(key)) continue;
 
             const state = this._states[key];
-            for(let symbol in state.transitions){
-                if(!state.transitions.hasOwnProperty(symbol)) continue;
+            for (let symbol in state.transitions) {
+                if (!state.transitions.hasOwnProperty(symbol)) continue;
 
-                state.transitions[symbol] = state.transitions[symbol].filter(target => target !== name);
+                state.transitions[symbol] = state.transitions[symbol].filter(
+                    target => target !== name
+                );
             }
         }
 
@@ -242,9 +252,11 @@ class FiniteAutomata{
      * @param {object} data
      * @return {FiniteAutomata}
      */
-    addState(data){
-        if(this._states[data.name] !== undefined){
-            throw new StateAlreadyExistsError(data.name + ' state already exits');
+    addState(data) {
+        if (this._states[data.name] !== undefined) {
+            throw new StateAlreadyExistsError(
+                data.name + ' state already exits'
+            );
         }
 
         this._states[data.name] = new State(data);

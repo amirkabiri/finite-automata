@@ -1,7 +1,7 @@
-function contextMenu(data){
+function contextMenu(data) {
     let contextMenu = $('#custom-context-menu');
     // if #custom-context-menu element not exists, create it
-    if(contextMenu === null){
+    if (contextMenu === null) {
         const ul = document.createElement('ul');
         ul.id = 'custom-context-menu';
         document.body.appendChild(ul);
@@ -14,7 +14,7 @@ function contextMenu(data){
 
     const { style } = contextMenu;
     // if data not passed to function, hide context menu
-    if(!data) {
+    if (!data) {
         style.display = 'none';
         return;
     }
@@ -22,18 +22,23 @@ function contextMenu(data){
     let { items, x, y } = data;
     let itemsDom = [];
 
-    for(let item of items){
-        if('children' in item){
-            itemsDom.push(`<li>${ item.text }<ul>${
-                item.children.map(subItem => {
-                    const subItemData = 'data' in subItem ? `'${ subItem.data }'` : '';
-                    return `<li onclick="(${ subItem.onclick })(${ subItemData })">${ subItem.text }</li>`;
-                }).join('')
-            }</ul><span>›</span></li>`);
-        }else{
-            const itemData = 'data' in item ? ` data-data="${ item.data }"` : '';
+    for (let item of items) {
+        if ('children' in item) {
+            itemsDom.push(
+                `<li>${item.text}<ul>${item.children
+                    .map(subItem => {
+                        const subItemData =
+                            'data' in subItem ? `'${subItem.data}'` : '';
+                        return `<li onclick="(${subItem.onclick})(${subItemData})">${subItem.text}</li>`;
+                    })
+                    .join('')}</ul><span>›</span></li>`
+            );
+        } else {
+            const itemData = 'data' in item ? ` data-data="${item.data}"` : '';
 
-            itemsDom.push(`<li onclick="(${ item.onclick })(${ itemData })">${ item.text }</li>`);
+            itemsDom.push(
+                `<li onclick="(${item.onclick})(${itemData})">${item.text}</li>`
+            );
         }
     }
     contextMenu.innerHTML = itemsDom.join('');
@@ -41,15 +46,15 @@ function contextMenu(data){
     style.display = 'block';
     const rect = contextMenu.getBoundingClientRect();
 
-    if(x + rect.width <= cnv.width){
+    if (x + rect.width <= cnv.width) {
         style.left = x + 'px';
-    }else{
+    } else {
         style.left = cnv.width - rect.width + 'px';
     }
 
-    if(y + rect.height <= cnv.height){
+    if (y + rect.height <= cnv.height) {
         style.top = y + 'px';
-    }else{
+    } else {
         style.top = cnv.height - rect.height + 'px';
     }
 }
