@@ -58,9 +58,7 @@ function minimizeDFA(dfa) {
         return false;
     };
     const checkEndCondition = (dfa1, dfa2) => {
-        const condition =
-            JSON.stringify(generateInitSet(dfa1)) ===
-            JSON.stringify(generateInitSet(dfa2));
+        const condition = JSON.stringify(generateInitSet(dfa1)) === JSON.stringify(generateInitSet(dfa2));
         // console.log(condition);
         return condition;
     };
@@ -116,9 +114,7 @@ function minimizeDFA(dfa) {
             const name = set.join(',');
             const transitions = {};
 
-            const prevTransitions = JSON.parse(
-                JSON.stringify(dfa.states[set[0]].transitions)
-            );
+            const prevTransitions = JSON.parse(JSON.stringify(dfa.states[set[0]].transitions));
             for (let symbol in prevTransitions) {
                 const target = prevTransitions[symbol][0];
 

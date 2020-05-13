@@ -29,9 +29,7 @@ function convertNFA2DFA(fa) {
     for (let state of powerSetOfStates) {
         // name of new dfa
         const name = state.sort().join(',');
-        const transitions = Object.fromEntries(
-            symbols.map(symbol => [symbol, []])
-        );
+        const transitions = Object.fromEntries(symbols.map(symbol => [symbol, []]));
         let isTerminal = false;
 
         // this func finds and fills current state transitions
@@ -48,12 +46,7 @@ function convertNFA2DFA(fa) {
                 for (let symbol of symbols) {
                     if (s.transitions[symbol] === undefined) continue;
 
-                    transitions[symbol] = [
-                        ...new Set([
-                            ...transitions[symbol],
-                            ...s.transitions[symbol],
-                        ]),
-                    ];
+                    transitions[symbol] = [...new Set([...transitions[symbol], ...s.transitions[symbol]])];
                 }
 
                 // handle lambda transitions
@@ -75,12 +68,7 @@ function convertNFA2DFA(fa) {
             x: 30 + Math.random() * (cnv.width - 60),
             y: 30 + Math.random() * (cnv.height - 60),
             terminal: isTerminal,
-            transitions: Object.fromEntries(
-                Object.entries(transitions).map(([symbol, target]) => [
-                    symbol,
-                    [target.sort().join(',')],
-                ])
-            ),
+            transitions: Object.fromEntries(Object.entries(transitions).map(([symbol, target]) => [symbol, [target.sort().join(',')]])),
         });
     }
 

@@ -19,10 +19,7 @@ class State {
     };
 
     getRadius = function () {
-        return (
-            config.state.radius +
-            (this.terminal ? config.state.terminalRadius : 0)
-        );
+        return config.state.radius + (this.terminal ? config.state.terminalRadius : 0);
     };
 
     renderSelfSymbols = function () {
@@ -35,10 +32,7 @@ class State {
                 // draw lines
                 if (fa.states[target] === undefined) continue;
                 const state = fa.states[target];
-                if (
-                    lineDrawed[this.name + '-' + state.name] === undefined &&
-                    lineDrawed[state.name + '-' + this.name] === undefined
-                ) {
+                if (lineDrawed[this.name + '-' + state.name] === undefined && lineDrawed[state.name + '-' + this.name] === undefined) {
                     lineDrawed[state.name + '-' + this.name] = true;
                     ctx.beginPath();
                     ctx.moveTo(this.x, this.y);
@@ -67,11 +61,7 @@ class State {
         ctx.font = '15px Tahoma';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(
-            symbols.map(c => (c === '' ? 'λ' : c)).join(','),
-            0,
-            2.9 * config.state.radius
-        );
+        ctx.fillText(symbols.map(c => (c === '' ? 'λ' : c)).join(','), 0, 2.9 * config.state.radius);
 
         ctx.restore();
 

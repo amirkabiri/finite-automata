@@ -34,9 +34,7 @@ $('#reset').onclick = function () {
 $$('#mode > button').forEach(
     button =>
         (button.onclick = function () {
-            $$('#mode > button').forEach(button =>
-                button.classList.remove('active')
-            );
+            $$('#mode > button').forEach(button => button.classList.remove('active'));
             mode = this.getAttribute('data-key');
             this.classList.add('active');
             saveMode();
@@ -159,9 +157,7 @@ cnv.onmouseup = function ({ x, y }) {
         if (states.length) {
             const start = fa.states[activeState];
             const target = states[0];
-            const symbol = prompt(
-                'enter symbol . for lambda symbol enter nothing and press ok'
-            );
+            const symbol = prompt('enter symbol . for lambda symbol enter nothing and press ok');
 
             if (symbol !== null) start.translate(symbol, target.name);
         }
@@ -204,13 +200,8 @@ function onTransitionRemoveClick(data) {
         const state = states[0];
         const [symbol, target] = data.split('-');
 
-        if (
-            symbol in state.transitions &&
-            state.transitions[symbol].includes(target)
-        ) {
-            state.transitions[symbol] = state.transitions[symbol].filter(
-                s => s !== target
-            );
+        if (symbol in state.transitions && state.transitions[symbol].includes(target)) {
+            state.transitions[symbol] = state.transitions[symbol].filter(s => s !== target);
         }
     }
 
@@ -229,10 +220,7 @@ cnv.oncontextmenu = function (e) {
             {
                 text: 'terminal ' + (state.terminal ? 'off' : 'on'),
                 onclick: () => {
-                    const states = fa.findNearestStates(
-                        contextMenuPos.x,
-                        contextMenuPos.y
-                    );
+                    const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
 
                     if (states.length) {
                         const state = states[0];
@@ -248,10 +236,7 @@ cnv.oncontextmenu = function (e) {
             {
                 text: 'rename state',
                 onclick: () => {
-                    const states = fa.findNearestStates(
-                        contextMenuPos.x,
-                        contextMenuPos.y
-                    );
+                    const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
 
                     if (states.length) {
                         const state = states[0];
@@ -278,28 +263,13 @@ cnv.oncontextmenu = function (e) {
                                     state.name = newName;
                                 }
                                 for (let symbol in state.transitions) {
-                                    if (
-                                        !state.transitions.hasOwnProperty(
-                                            symbol
-                                        )
-                                    )
-                                        continue;
+                                    if (!state.transitions.hasOwnProperty(symbol)) continue;
 
                                     for (let s in state.transitions[symbol]) {
-                                        if (
-                                            !state.transitions[
-                                                symbol
-                                            ].hasOwnProperty(s)
-                                        )
-                                            continue;
+                                        if (!state.transitions[symbol].hasOwnProperty(s)) continue;
 
-                                        if (
-                                            state.transitions[symbol][s] ===
-                                            oldName
-                                        ) {
-                                            state.transitions[symbol][
-                                                s
-                                            ] = newName;
+                                        if (state.transitions[symbol][s] === oldName) {
+                                            state.transitions[symbol][s] = newName;
                                         }
                                     }
                                 }
@@ -316,10 +286,7 @@ cnv.oncontextmenu = function (e) {
             {
                 text: 'remove state',
                 onclick: () => {
-                    const states = fa.findNearestStates(
-                        contextMenuPos.x,
-                        contextMenuPos.y
-                    );
+                    const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
 
                     if (states.length) {
                         const state = states[0];
@@ -341,9 +308,7 @@ cnv.oncontextmenu = function (e) {
         for (let symbol in state.transitions) {
             for (let target of state.transitions[symbol]) {
                 removeTransitionsMenu.push({
-                    text: `σ({${state.name}}, ${
-                        symbol === '' ? 'λ' : symbol
-                    }) = {${target}}`,
+                    text: `σ({${state.name}}, ${symbol === '' ? 'λ' : symbol}) = {${target}}`,
                     data: `${symbol}-${target}`,
                     onclick: onTransitionRemoveClick,
                 });
@@ -360,10 +325,7 @@ cnv.oncontextmenu = function (e) {
             items.push({
                 text: 'make start point',
                 onclick: () => {
-                    const states = fa.findNearestStates(
-                        contextMenuPos.x,
-                        contextMenuPos.y
-                    );
+                    const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
 
                     if (states.length) {
                         const state = states[0];
@@ -388,9 +350,7 @@ cnv.oncontextmenu = function (e) {
                     text: 'create new state',
                     onclick: () => {
                         const { x, y } = contextMenuPos;
-                        const name = prompt(
-                            'whats name of state you wanna create ?'
-                        );
+                        const name = prompt('whats name of state you wanna create ?');
 
                         if (name === null || !name.trim()) return;
 

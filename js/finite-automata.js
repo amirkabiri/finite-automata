@@ -41,9 +41,7 @@ class FiniteAutomata {
     }
     set start(start) {
         if (!Object.keys(this._states).includes(start)) {
-            throw new StateNotFoundError(
-                start + ' state does not exits in this finite automata'
-            );
+            throw new StateNotFoundError(start + ' state does not exits in this finite automata');
         }
 
         this._start = start;
@@ -52,8 +50,7 @@ class FiniteAutomata {
     get symbols() {
         const predictedSymbols = this._predictSymbols();
 
-        if (predictedSymbols.length > this._symbols.length)
-            return predictedSymbols;
+        if (predictedSymbols.length > this._symbols.length) return predictedSymbols;
 
         return this._symbols;
     }
@@ -95,10 +92,7 @@ class FiniteAutomata {
                 // if with a symbol, was connected to more than one state
                 // or state has not the symbol in transitions object (is not deterministic)
                 // return false, that means this is not a dfa
-                if (
-                    transitions[symbol] === undefined ||
-                    transitions[symbol].length !== 1
-                ) {
+                if (transitions[symbol] === undefined || transitions[symbol].length !== 1) {
                     return false;
                 }
             }
@@ -127,11 +121,7 @@ class FiniteAutomata {
                 this._states[key] = new State(json.states[key]);
             }
         }
-        if (
-            json.hasOwnProperty('states') &&
-            json.hasOwnProperty('start') &&
-            Object.keys(json.states).includes(json.start)
-        ) {
+        if (json.hasOwnProperty('states') && json.hasOwnProperty('start') && Object.keys(json.states).includes(json.start)) {
             this._start = json.start;
         }
         if (json.hasOwnProperty('symbols') && Array.isArray(json.symbols)) {
@@ -161,9 +151,7 @@ class FiniteAutomata {
      */
     findNearestStates(x, y) {
         return Object.values(this._states).filter(state => {
-            const distance = Math.sqrt(
-                Math.pow(x - state.x, 2) + Math.pow(y - state.y, 2)
-            );
+            const distance = Math.sqrt(Math.pow(x - state.x, 2) + Math.pow(y - state.y, 2));
 
             return distance <= state.getRadius();
         });
@@ -237,9 +225,7 @@ class FiniteAutomata {
             for (let symbol in state.transitions) {
                 if (!state.transitions.hasOwnProperty(symbol)) continue;
 
-                state.transitions[symbol] = state.transitions[symbol].filter(
-                    target => target !== name
-                );
+                state.transitions[symbol] = state.transitions[symbol].filter(target => target !== name);
             }
         }
 
@@ -254,9 +240,7 @@ class FiniteAutomata {
      */
     addState(data) {
         if (this._states[data.name] !== undefined) {
-            throw new StateAlreadyExistsError(
-                data.name + ' state already exits'
-            );
+            throw new StateAlreadyExistsError(data.name + ' state already exits');
         }
 
         this._states[data.name] = new State(data);

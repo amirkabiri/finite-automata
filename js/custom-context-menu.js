@@ -27,8 +27,7 @@ function contextMenu(data) {
             itemsDom.push(
                 `<li>${item.text}<ul>${item.children
                     .map(subItem => {
-                        const subItemData =
-                            'data' in subItem ? `'${subItem.data}'` : '';
+                        const subItemData = 'data' in subItem ? `'${subItem.data}'` : '';
                         return `<li onclick="(${subItem.onclick})(${subItemData})">${subItem.text}</li>`;
                     })
                     .join('')}</ul><span>›</span></li>`
@@ -36,9 +35,7 @@ function contextMenu(data) {
         } else {
             const itemData = 'data' in item ? ` data-data="${item.data}"` : '';
 
-            itemsDom.push(
-                `<li onclick="(${item.onclick})(${itemData})">${item.text}</li>`
-            );
+            itemsDom.push(`<li onclick="(${item.onclick})(${itemData})">${item.text}</li>`);
         }
     }
     contextMenu.innerHTML = itemsDom.join('');

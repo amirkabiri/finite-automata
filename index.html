@@ -1,65 +1,74 @@
 <html lang="en">
-<head>
-	<title>Finite Automata Designer</title>
+    <head>
+        <title>Finite Automata Designer</title>
 
-	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.9.3/introjs.min.css" integrity="sha256-/oZ7h/Jkj6AfibN/zTWrCoba0L+QhP9Tf/ZSgyZJCnY=" crossorigin="anonymous" />
-	<link rel="stylesheet" href="app.css">
-</head>
-<body>
-	<template data-modal="welcome-modal">
-		<div id="welcome-modal">
-			<div id="welcome-modal-title">
-				welcome to <h1>Finite Automata Designer</h1>
-			</div>
-			<p id="welcome-modal-description">
-				This is an open source project on <a href="https://github.com/amirkabiri/finite-automata">Github</a> that developed for <strong>Formal Languages And Automata</strong> lesson.
-				<br>
-				This project helps you to design Finite Automata graphically and do some operations on it.
-				<br>
-				<br>
-				For first step, we suggest you take a quick tutorial to get acquainted with the features of this app.
-			</p>
-			<div id="welcome-modal-buttons">
-				<button id="welcome-modal-tutorial">Take a quick tutorial</button>
-				<a href="#" id="welcome-modal-skip">Skip</a>
-			</div>
-		</div>
-	</template>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.9.3/introjs.min.css"
+            integrity="sha256-/oZ7h/Jkj6AfibN/zTWrCoba0L+QhP9Tf/ZSgyZJCnY="
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" href="app.css" />
+    </head>
+    <body>
+        <template data-modal="welcome-modal">
+            <div id="welcome-modal">
+                <div id="welcome-modal-title">
+                    welcome to
+                    <h1>Finite Automata Designer</h1>
+                </div>
+                <p id="welcome-modal-description">
+                    This is an open source project on <a href="https://github.com/amirkabiri/finite-automata">Github</a> that developed for
+                    <strong>Formal Languages And Automata</strong> lesson.
+                    <br />
+                    This project helps you to design Finite Automata graphically and do some operations on it.
+                    <br />
+                    <br />
+                    For first step, we suggest you take a quick tutorial to get acquainted with the features of this app.
+                </p>
+                <div id="welcome-modal-buttons">
+                    <button id="welcome-modal-tutorial">Take a quick tutorial</button>
+                    <a href="#" id="welcome-modal-skip">Skip</a>
+                </div>
+            </div>
+        </template>
 
-	<div id="tools" data-intro="this is your toolbox. you can do this operations on your finite automata" data-step="1">
-		<button id="reset">reset</button>
-		<button id="export-image">export image</button>
-		<button id="minimizedfa">minimize dfa</button>
-		<button id="convert2dfa">convert to dfa</button>
-		<button id="complement">complement</button>
-		<div>active mode : </div>
-		<div id="mode">
-			<button data-key="move" class="active">move</button>
-			<button data-key="design">design</button>
-		</div>
-	</div>
+        <div id="tools" data-intro="this is your toolbox. you can do this operations on your finite automata" data-step="1">
+            <button id="reset">reset</button>
+            <button id="export-image">export image</button>
+            <button id="minimizedfa">minimize dfa</button>
+            <button id="convert2dfa">convert to dfa</button>
+            <button id="complement">complement</button>
+            <div>active mode :</div>
+            <div id="mode">
+                <button data-key="move" class="active">move</button>
+                <button data-key="design">design</button>
+            </div>
+        </div>
 
-	<div id="copyright">
-		<p><a href="https://github.com/amirkabiri/finite-automata">Github Repository</a></p>
-	</div>
+        <div id="copyright">
+            <p><a href="https://github.com/amirkabiri/finite-automata">Github Repository</a></p>
+        </div>
 
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.9.3/intro.min.js"
+            integrity="sha256-fOPHmaamqkHPv4QYGxkiSKm7O/3GAJ4554pQXYleoLo="
+            crossorigin="anonymous"
+        ></script>
 
+        <script src="js/utils.js"></script>
+        <script src="js/storage.js"></script>
+        <script src="js/custom-errors.js"></script>
+        <script src="js/custom-context-menu.js"></script>
+        <script src="js/modal.js"></script>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.9.3/intro.min.js" integrity="sha256-fOPHmaamqkHPv4QYGxkiSKm7O/3GAJ4554pQXYleoLo=" crossorigin="anonymous"></script>
-	
-	<script src="js/utils.js"></script>
-	<script src="js/storage.js"></script>
-	<script src="js/custom-errors.js"></script>
-	<script src="js/custom-context-menu.js"></script>
-	<script src="js/modal.js"></script>
-
-	<script src="js/dfa-complement.js"></script>
-	<script src="js/nfa-renderer.js"></script>
-	<script src="js/dfa-converter.js"></script>
-	<script src="js/dfa-minimizer.js"></script>
-	<script src="js/finite-automata.js"></script>
-	<script src="js/state.js"></script>
-	<script src="js/app.js"></script>
-</body>
+        <script src="js/dfa-complement.js"></script>
+        <script src="js/nfa-renderer.js"></script>
+        <script src="js/dfa-converter.js"></script>
+        <script src="js/dfa-minimizer.js"></script>
+        <script src="js/finite-automata.js"></script>
+        <script src="js/state.js"></script>
+        <script src="js/app.js"></script>
+    </body>
 </html>
