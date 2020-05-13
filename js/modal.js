@@ -5,15 +5,29 @@ class Modal {
             throw new Error(key + ' not exists');
         }
 
+        const modal = this._createModalElement(template);
+        document.body.appendChild(modal);
+        this.modal = modal;
+
+        // remove template
+        template.remove();
+
+        // close modal when clicked on container
+        modal.onclick = () => this.close();
+        // don't close modal when clicked on body
+        modal.querySelector('.modal-body').onclick = e => {
+            e.preventDefault();
+            e.stopPropagation();
+        };
+        // close modal when clicked on close button
+        modal.querySelector('.modal-close').onclick = () => this.close();
+    }
+
+    _createModalElement(template) {
         const modal = document.createElement('div');
         modal.className = ['modal', open ? 'open' : ''].join(' ');
         modal.innerHTML = `<div class="modal-body"><div class="modal-close">×</div>${template.innerHTML}</div>`;
-
-        document.body.appendChild(modal);
-        template.remove();
-        this.modal = modal;
-
-        modal.querySelector('.modal-close').onclick = () => this.close();
+        return modal;
     }
 
     get isOpen() {
