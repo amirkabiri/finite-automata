@@ -1,0 +1,21 @@
+{
+    "name": "finite-automata",
+    "version": "1.0.0",
+    "description": "a graphical interface for designing finite automata",
+    "main": "index.js",
+    "repository": "https://github.com/amirkabiri/finite-automata.git",
+    "author": "amir kabiri <akabiridev@gmail.com>",
+    "license": "MIT",
+    "devDependencies": {
+        "prettier": "^2.0.5"
+    },
+    "prettier": {
+        "trailingComma": "es5",
+        "tabWidth": 4,
+        "semi": true,
+        "singleQuote": true,
+        "useTabs" : false,
+        "bracketSpacing" : true,
+        "arrowParens" : "avoid"
+    }
+}
