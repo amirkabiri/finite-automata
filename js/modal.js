@@ -1,11 +1,11 @@
 class Modal {
-    constructor(key, { open } = {}) {
+    constructor(key, options) {
         const template = document.querySelector(`[data-modal="${key}"]`);
         if (!template) {
             throw new Error(key + ' not exists');
         }
 
-        const modal = this._createModalElement(template);
+        const modal = this._createModalElement(template, options);
         document.body.appendChild(modal);
         this.modal = modal;
 
@@ -23,7 +23,7 @@ class Modal {
         modal.querySelector('.modal-close').onclick = () => this.close();
     }
 
-    _createModalElement(template) {
+    _createModalElement(template, { open }) {
         const modal = document.createElement('div');
         modal.className = ['modal', open ? 'open' : ''].join(' ');
         modal.innerHTML = `<div class="modal-body"><div class="modal-close">×</div>${template.innerHTML}</div>`;
