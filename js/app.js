@@ -341,7 +341,7 @@ cnv.oncontextmenu = function(e){
                         const { x, y } = contextMenuPos;
                         const name = prompt('whats name of state you wanna create ?');
 
-                        if(name === null) return;
+                        if(name === null || !name.trim()) return;
 
                         try{
                             fa.addState({
