@@ -28,3 +28,12 @@ function load() {
         return '{}';
     }
 }
+function isFirstVisit() {
+    try {
+        if (localStorage.fa !== undefined || localStorage.mode !== undefined) return false;
+
+        return true;
+    } catch (e) {
+        return true;
+    }
+}

@@ -1,4 +1,4 @@
-const welcomeModal = new Modal('welcome-modal', { open: true });
+const welcomeModal = new Modal('welcome-modal', { open: isFirstVisit() });
 $('#welcome-modal-skip').onclick = () => welcomeModal.close();
 $('#welcome-modal-tutorial').onclick = () => {
     welcomeModal.close();
