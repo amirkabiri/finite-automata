@@ -2,6 +2,8 @@ function convertNFA2DFA(fa) {
     // if it's a dfa, don't need to convert !
     if (fa.isDFA()) return fa;
 
+    // we need to check here that fa has start state or no
+    // even if this was checked when calling this function
     if (fa.start === null || !Object.keys(fa.states).includes(fa.start)) {
         throw new NoStartPointError();
     }

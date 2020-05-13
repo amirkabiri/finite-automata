@@ -1,3 +1,10 @@
+const welcomeModal = new Modal('welcome-modal', { open: true });
+$('#welcome-modal-skip').onclick = () => welcomeModal.close();
+$('#welcome-modal-tutorial').onclick = () => {
+    welcomeModal.close();
+    introJs().start();
+};
+
 let mode = 'move';
 window.onload = () => $('#mode [data-key="' + loadMode() + '"]').click();
 const [cnv, ctx] = createCanvas(innerWidth, innerHeight);
@@ -57,12 +64,16 @@ $('#minimizedfa').onclick = () => {
 };
 
 $('#convert2dfa').onclick = () => {
-    let { symbols } = fa;
-    symbols = prompt('enter symbols without space : ', symbols.join(''));
-    if (symbols === null) return;
-    fa.symbols = symbols.split('');
-
     try {
+        if (fa.start === null || !Object.keys(fa.states).includes(fa.start)) {
+            throw new NoStartPointError();
+        }
+
+        let { symbols } = fa;
+        symbols = prompt('enter symbols without space : ', symbols.join(''));
+        if (symbols === null) return;
+        fa.symbols = symbols.split('');
+
         fa = convertNFA2DFA(fa);
         fa = removeUselessStates(fa);
         render();
@@ -259,13 +270,29 @@ cnv.oncontextmenu = function (e) {
                             delete fa.states[oldName];
 
                             for (let key in fa.states) {
+                                if (!fa.states.hasOwnProperty(key)) continue;
+
                                 const state = fa.states[key];
 
                                 if (state.name === oldName) {
                                     state.name = newName;
                                 }
                                 for (let symbol in state.transitions) {
+                                    if (
+                                        !state.transitions.hasOwnProperty(
+                                            symbol
+                                        )
+                                    )
+                                        continue;
+
                                     for (let s in state.transitions[symbol]) {
+                                        if (
+                                            !state.transitions[
+                                                symbol
+                                            ].hasOwnProperty(s)
+                                        )
+                                            continue;
+
                                         if (
                                             state.transitions[symbol][s] ===
                                             oldName

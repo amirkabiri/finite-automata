@@ -1,7 +1,9 @@
-body {
-    padding: 0;
+body{
+    font-family: 'Montserrat', sans-serif;
+    padding:0;
     user-select: none;
-    margin: 0;
+    margin:0;
+    font-size: 16px;
 }
 canvas {
     background: #ddd;
@@ -9,9 +11,10 @@ canvas {
 ul {
     list-style: none;
 }
-* {
-    padding: 0;
-    margin: 0;
+*{
+    font-family: 'Montserrat', sans-serif;
+    padding:0;
+    margin:0;
 }
 
 #tools {
@@ -91,13 +94,116 @@ ul {
 
 #copyright {
     position: fixed;
-    width: max-content;
-    left: 0;
-    bottom: 0;
-    color: black;
-    padding-left: 10px;
-    padding-bottom: 7px;
+    width:max-content;
+    left:0;
+    bottom:0;
+    color:black;
+    padding-left:10px;
+    padding-bottom:7px;
 }
-#copyright > p > a {
-    color: tomato;
+#copyright > p > a{
+    color:tomato;
+}
+
+
+
+
+.modal{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background:rgba(0,0,0,.3);
+    z-index: 900;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity .2s;
+    overflow-y: auto;
+}
+.modal.open{
+    display: flex;
+    visibility: visible;
+    opacity: 1;
+}
+.modal-body{
+    box-shadow: 0 0 50px rgba(0,0,0,.15);
+    background: white;
+    width:calc(100% - 50px);
+    max-width: 600px;
+    height:max-content;
+    box-sizing: border-box;
+    padding:50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+.modal-close{
+    position: absolute;
+    left:-25px;
+    top: -25px;
+    width:50px;
+    height: 50px;
+    background: tomato;
+    color:white;
+    font-size: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+#welcome-modal{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+#welcome-modal > *{
+    width: 100%;
+    text-align: center;
+}
+#welcome-modal-title{
+    color:#444;
+}
+#welcome-modal-description{
+    margin-top:30px;
+    color:#444;
+    line-height: 25px;
+}
+#welcome-modal-description > a{
+    color:tomato;
+}
+#welcome-modal-tutorial{
+    width:max-content;
+    padding:10px 20px;
+    font-size: 16px;
+    border:1px solid tomato;
+    color:tomato;
+    cursor: pointer;
+    position: relative;
+    background: transparent;
+    box-shadow: inset 0 0 0 0 tomato;
+    transition: ease-out 0.4s;
+}
+#welcome-modal-tutorial:hover{
+    box-shadow: inset 400px 0 0 0 tomato;
+    color:white;
+}
+#welcome-modal-buttons{
+    margin-top:20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#welcome-modal-skip{
+    text-decoration: none;
+    margin-top:10px;
+    color:#444;
 }
