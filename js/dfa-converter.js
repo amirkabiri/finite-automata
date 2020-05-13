@@ -2,10 +2,6 @@ function convertNFA2DFA(fa){
     // if it's a dfa, don't need to convert !
     if(fa.isDFA()) return fa;
 
-    if(fa.start === null || !Object.keys(fa.states).includes(fa.start)){
-        throw new NoStartPointError;
-    }
-
     const symbols = [... new Set([... fa.symbols])];
 
     const stateNames = Object.keys(fa.states);

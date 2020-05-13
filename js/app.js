@@ -62,22 +62,26 @@ $('#minimizedfa').onclick = () => {
 };
 
 $('#convert2dfa').onclick = () => {
-    let { symbols } = fa;
-    symbols = prompt('enter symbols without space : ', symbols.join(''));
-    if(symbols === null) return;
-    fa.symbols = symbols.split('');
-
-    try{
-        fa = convertNFA2DFA(fa);
-        fa = removeUselessStates(fa);
-        render();
-    }catch (e) {
-        if(e instanceof NoStartPointError){
-            alert(e.message);
-        }else{
-            console.log(e);
+	try{
+		if(fa.start === null || !Object.keys(fa.states).includes(fa.start)) {
+			throw new NoStartPointError();
         }
-    }
+        
+		let { symbols } = fa;
+		symbols = prompt('enter symbols without space : ', symbols.join(''));
+		if(symbols === null) return;
+		fa.symbols = symbols.split('');
+
+		fa = convertNFA2DFA(fa);
+		fa = removeUselessStates(fa);
+		render();
+	}catch (e) {
+		if(e instanceof NoStartPointError){
+			alert(e.message);
+		}else{
+			console.log(e);
+		}
+	}
 };
 
 $('#complement').onclick = () => {
