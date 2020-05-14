@@ -7,7 +7,7 @@ class State {
         this.transitions = transitions || {};
     }
 
-    translate = function (symbol, state) {
+    translate(symbol, state) {
         if (this.transitions[symbol] === undefined) {
             this.transitions[symbol] = [];
         }
@@ -16,13 +16,13 @@ class State {
         }
 
         return this;
-    };
+    }
 
-    getRadius = function () {
+    getRadius() {
         return config.state.radius + (this.terminal ? config.state.terminalRadius : 0);
-    };
+    }
 
-    renderSelfSymbols = function () {
+    renderSelfSymbols() {
         const symbols = [];
 
         const lineDrawed = {};
@@ -66,9 +66,9 @@ class State {
         ctx.restore();
 
         return this;
-    };
+    }
 
-    renderSymbols = function () {
+    renderSymbols() {
         const targets = {};
 
         for (let symbol in this.transitions) {
@@ -120,9 +120,9 @@ class State {
             );
             ctx.restore();
         }
-    };
+    }
 
-    renderState = function () {
+    renderState() {
         const state = this;
         ctx.save();
 
@@ -153,5 +153,5 @@ class State {
         ctx.fillText(state.name, state.x, state.y);
 
         ctx.restore();
-    };
+    }
 }
