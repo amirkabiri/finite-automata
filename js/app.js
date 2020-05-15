@@ -90,7 +90,7 @@ $('#convertnfa2re').onclick = () => {
         fa = converter.run();
         render();
     } catch (e) {
-        if ([IsNotNonDeterministicError, NoStartPointError, NoTerminalStateError, AlreadyConvertedToREError].some(errorType => e instanceof errorType)) {
+        if (e instanceof CustomError) {
             alert(e.message);
         } else {
             console.log(e);
