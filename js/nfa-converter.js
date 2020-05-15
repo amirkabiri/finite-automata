@@ -119,7 +119,7 @@ class convertNFA2RE {
                             // new symbol =>
                             // "symbol_of_transition_of_origin(star_transition_symbols_joined_with_comma)*symbol_of_transition_of_current_state
                             originState.transitions[
-                                (originTransitionSymbol + '(' + starTransitionSymbol.join(',') + ')*' + currentStateTransitionSymbol).trim()
+                                (originTransitionSymbol + '(' + starTransitionSymbol.join('+') + ')*' + currentStateTransitionSymbol).trim()
                             ] = currentStateTransition;
                         }
                     }
@@ -163,7 +163,7 @@ class convertNFA2RE {
                     state.transitions[
                         '(' +
                             (transitionOneSymbol.trim().length === 0 ? 'λ' : transitionOneSymbol) +
-                            ',' +
+                            '+' +
                             (transitionTwoSymbol.trim().length === 0 ? 'λ' : transitionTwoSymbol) +
                             ')'
                     ] = state.transitions[transitionOneSymbol];
