@@ -291,13 +291,15 @@ class FiniteAutomata {
 
     /**
      * Check if this FiniteAutomata is a NFA
-     *
-     * If a FiniteAutomata has a trap state, is not a NFA
-     *
      * @returns {boolean} Returns true if this FiniteAutomata is a NFA otherwise returns false
      */
     isNFA() {
-        // Check if this FiniteAutomata has a trap state or not
-        return !Object.values(this._states).some(state => state.name.trim() === '');
+        /* for checking a FiniteAutomata is Non-Deterministic, we should check two factors :
+         *   1. first factor is that the fa has any lambda transition or not
+         *   2. second factor is that any state in fa, should not have exactly one transition by every symbol to another state
+         *
+         * we have already method this.isDFA that this factors are implemented there, so we are using that method here
+         */
+        return !this.isDFA();
     }
 }
