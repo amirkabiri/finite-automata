@@ -208,6 +208,35 @@ function onTransitionRemoveClick(data) {
     render();
     contextMenu();
 }
+function onTransitionRenameClick(data) {
+    const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
+
+    if (states.length) {
+        const state = states[0];
+        const [symbol, target] = data.split('-');
+        const newSymbol = prompt('enter symbol. for lambda symbol enter nothing and press ok', symbol);
+        console.log(newSymbol);
+        if (newSymbol !== null && newSymbol !== symbol) {
+            if (state.transitions[symbol].length > 1) {
+                state.transitions[symbol] = state.transitions[symbol].filter(s => s !== target);
+                if (!state.transitions[newSymbol] || state.transitions[newSymbol].length === 0) {
+                    state.transitions[newSymbol] = [];
+                }
+                state.transitions[newSymbol].push(target);
+            } else {
+                delete state.transitions[symbol];
+                if (state.transitions[newSymbol]) {
+                    state.transitions[newSymbol].push(target);
+                    state.transitions[newSymbol] = [...new Set(state.transitions[newSymbol])];
+                }else{
+                    state.transitions[newSymbol] = [target];
+                }
+            }
+        }
+    }
+    render();
+    contextMenu();
+}
 cnv.oncontextmenu = function (e) {
     e.preventDefault();
     const { x, y } = e;
@@ -318,6 +347,23 @@ cnv.oncontextmenu = function (e) {
             items.push({
                 text: 'remove transitions',
                 children: removeTransitionsMenu,
+            });
+        }
+
+        const renameTransitionsMenu = [];
+        for (let symbol in state.transitions) {
+            for (let target of state.transitions[symbol]) {
+                renameTransitionsMenu.push({
+                    text: `σ({${state.name}}, ${symbol === '' ? 'λ' : symbol}) = {${target}}`,
+                    data: `${symbol}-${target}`,
+                    onclick: onTransitionRenameClick,
+                });
+            }
+        }
+        if (renameTransitionsMenu.length) {
+            items.push({
+                text: 'rename transitions',
+                children: renameTransitionsMenu,
             });
         }
 
