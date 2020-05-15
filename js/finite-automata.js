@@ -114,6 +114,11 @@ class FiniteAutomata {
             throw new InvalidJsonError('imported string is not a valid json');
         }
 
+        // clear previous data before importing
+        this._states = {};
+        this._start = null;
+        this._symbols = [];
+
         if (json.hasOwnProperty('states') && typeof json.states === 'object') {
             for (let key in json.states) {
                 if (!json.states.hasOwnProperty(key)) continue;
