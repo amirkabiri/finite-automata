@@ -9,6 +9,11 @@ class IsNotDeterministicError extends CustomError {
         super(message);
     }
 }
+class IsNotNonDeterministicError extends CustomError {
+    constructor(message = 'this finite automata is not non-deterministic') {
+        super(message);
+    }
+}
 class NoStartPointError extends CustomError {
     constructor(message = 'there is no start state') {
         super(message);
@@ -36,6 +41,16 @@ class StatesShouldBeObjectError extends CustomError {
 }
 class InvalidJsonError extends CustomError {
     constructor(message = 'is not a valid json string') {
+        super(message);
+    }
+}
+class NoTerminalStateError extends CustomError {
+    constructor(message = 'there is no terminal state') {
+        super(message);
+    }
+}
+class AlreadyConvertedToREError extends CustomError {
+    constructor(message = 'fa is already converted to re') {
         super(message);
     }
 }

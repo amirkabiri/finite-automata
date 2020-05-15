@@ -84,6 +84,35 @@ $('#convert2dfa').onclick = () => {
     }
 };
 
+$('#convertnfa2re').onclick = () => {
+    try {
+        if (!fa.isNFA()) {
+            throw new IsNotNonDeterministicError();
+        }
+
+        if (fa.start === null || !Object.keys(fa.states).includes(fa.start)) {
+            throw new NoStartPointError();
+        }
+
+        if (!fa.hasAnyTerminalState()) {
+            throw new NoTerminalStateError();
+        }
+
+        if (fa.isGeneralizedFa()) {
+            throw new AlreadyConvertedToREError();
+        }
+
+        convertNFA2RE(fa);
+        render();
+    } catch (e) {
+        if ([IsNotNonDeterministicError, NoStartPointError, NoTerminalStateError, AlreadyConvertedToREError].some(errorType => e instanceof errorType)) {
+            alert(e.message);
+        } else {
+            console.log(e);
+        }
+    }
+};
+
 $('#complement').onclick = () => {
     try {
         fa = dfaComplement(fa);
@@ -228,7 +257,7 @@ function onTransitionRenameClick(data) {
                 if (state.transitions[newSymbol]) {
                     state.transitions[newSymbol].push(target);
                     state.transitions[newSymbol] = [...new Set(state.transitions[newSymbol])];
-                }else{
+                } else {
                     state.transitions[newSymbol] = [target];
                 }
             }

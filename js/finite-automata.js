@@ -247,4 +247,57 @@ class FiniteAutomata {
 
         return this;
     }
+
+    /**
+     * Checking if this FiniteAutomata has any terminal state
+     * @return {boolean}
+     */
+    hasAnyTerminalState() {
+        // Loop over all states and check if any state is terminal
+        for (let name in this._states) {
+            if (!this._states.hasOwnProperty(name)) continue;
+
+            const state = this._states[name];
+            if (state.terminal) {
+                // One terminal state found
+                return true;
+            }
+        }
+
+        // No termianl state found
+        return false;
+    }
+
+    /**
+     * Checking if this FiniteAutomata is a GeneralizedFiniteAutomata
+     * GeneralizedFiniteAutomata is made after converting Non-deterministicFiniteAutomata to RegularExpression
+     * @return {boolean}
+     */
+    isGeneralizedFa() {
+        // If an fa has two states that start state is λ state and non-terminal
+        // and the other state is only terminal state of fa
+        // that fa is a GeneralizedFiniteAutomata
+        if (
+            Object.keys(this._states).length === 2 &&
+            this._start === 'λ' &&
+            Object.values(fa._states).filter(state => state.name !== fa._start)[0].terminal &&
+            !fa._states[fa._start].terminal
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if this FiniteAutomata is a NFA
+     *
+     * If a FiniteAutomata has a trap state, is not a NFA
+     *
+     * @returns {boolean} Returns true if this FiniteAutomata is a NFA otherwise returns false
+     */
+    isNFA() {
+        // Check if this FiniteAutomata has a trap state or not
+        return !Object.values(this._states).some(state => state.name.trim() === '');
+    }
 }
