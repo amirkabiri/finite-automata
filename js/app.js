@@ -87,8 +87,18 @@ $('#convert2dfa').onclick = () => {
 $('#convertnfa2re').onclick = () => {
     try {
         const converter = new convertNFA2RE(fa);
-        fa = converter.run();
-        render();
+        const resFA = converter.run();
+        let { transitions } = resFA.states[resFA.start];
+        let symbol;
+
+        for (symbol in transitions) {
+            if (!transitions.hasOwnProperty(symbol)) continue;
+            if (transitions[symbol].length) break;
+        }
+
+        if (confirm(`result : ${symbol} \n click ok to copy to clipboard`)) {
+            navigator.clipboard.writeText(symbol).then(() => alert('copied to clip'));
+        }
     } catch (e) {
         if (e instanceof CustomError) {
             alert(e.message);
