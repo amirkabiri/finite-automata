@@ -1,8 +1,5 @@
 class convertNFA2RE {
     constructor(fa) {
-        if (!fa.isNFA()) {
-            throw new IsNotNonDeterministicError();
-        }
         if (fa.start === null || !Object.keys(fa.states).includes(fa.start)) {
             throw new NoStartPointError();
         }
