@@ -86,22 +86,6 @@ $('#convert2dfa').onclick = () => {
 
 $('#convertnfa2re').onclick = () => {
     try {
-        if (!fa.isNFA()) {
-            throw new IsNotNonDeterministicError();
-        }
-
-        if (fa.start === null || !Object.keys(fa.states).includes(fa.start)) {
-            throw new NoStartPointError();
-        }
-
-        if (!fa.hasAnyTerminalState()) {
-            throw new NoTerminalStateError();
-        }
-
-        if (fa.isGeneralizedFa()) {
-            throw new AlreadyConvertedToREError();
-        }
-
         convertNFA2RE(fa);
         render();
     } catch (e) {

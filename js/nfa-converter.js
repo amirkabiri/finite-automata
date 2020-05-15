@@ -16,7 +16,21 @@
  *
  * @return
  */
+
 function convertNFA2RE(fa) {
+    if (!fa.isNFA()) {
+        throw new IsNotNonDeterministicError();
+    }
+    if (fa.start === null || !Object.keys(fa.states).includes(fa.start)) {
+        throw new NoStartPointError();
+    }
+    if (!fa.hasAnyTerminalState()) {
+        throw new NoTerminalStateError();
+    }
+    if (fa.isGeneralizedFa()) {
+        throw new AlreadyConvertedToREError();
+    }
+
     // Step 1
     let newStartState = {
         name: 'λ',
