@@ -194,48 +194,48 @@ cnv.onmousemove = function ({ x, y }) {
     }
 };
 function onTransitionRemoveClick(data) {
+    contextMenu();
     const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
+    if (!states.length) return false;
 
-    if (states.length) {
-        const state = states[0];
-        const [symbol, target] = data.split('-');
+    const state = states[0];
+    const [symbol, target] = data.split('-');
 
-        if (symbol in state.transitions && state.transitions[symbol].includes(target)) {
-            state.transitions[symbol] = state.transitions[symbol].filter(s => s !== target);
-        }
+    if (symbol in state.transitions && state.transitions[symbol].includes(target)) {
+        state.transitions[symbol] = state.transitions[symbol].filter(s => s !== target);
     }
 
     render();
-    contextMenu();
 }
 function onTransitionRenameClick(data) {
+    contextMenu();
     const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
+    // no state selected, so terminate the rest of execution
+    if (!states.length) return false;
 
-    if (states.length) {
-        const state = states[0];
-        const [symbol, target] = data.split('-');
-        const newSymbol = prompt('enter symbol. for lambda symbol enter nothing and press ok', symbol);
-        console.log(newSymbol);
-        if (newSymbol !== null && newSymbol !== symbol) {
-            if (state.transitions[symbol].length > 1) {
-                state.transitions[symbol] = state.transitions[symbol].filter(s => s !== target);
-                if (!state.transitions[newSymbol] || state.transitions[newSymbol].length === 0) {
-                    state.transitions[newSymbol] = [];
-                }
-                state.transitions[newSymbol].push(target);
-            } else {
-                delete state.transitions[symbol];
-                if (state.transitions[newSymbol]) {
-                    state.transitions[newSymbol].push(target);
-                    state.transitions[newSymbol] = [...new Set(state.transitions[newSymbol])];
-                }else{
-                    state.transitions[newSymbol] = [target];
-                }
-            }
+    const state = states[0];
+    const [symbol, target] = data.split('-');
+    const newSymbol = prompt('enter symbol. for lambda symbol enter nothing and press ok', symbol);
+    // if operation canceled or newSymbol is equals to old symbol, terminate the rest of execution
+    if (newSymbol === null || newSymbol === symbol) return false;
+
+    if (state.transitions[symbol].length > 1) {
+        state.transitions[symbol] = state.transitions[symbol].filter(s => s !== target);
+        if (!state.transitions[newSymbol] || state.transitions[newSymbol].length === 0) {
+            state.transitions[newSymbol] = [];
+        }
+        state.transitions[newSymbol].push(target);
+    } else {
+        delete state.transitions[symbol];
+        if (state.transitions[newSymbol]) {
+            state.transitions[newSymbol].push(target);
+            state.transitions[newSymbol] = [...new Set(state.transitions[newSymbol])];
+        } else {
+            state.transitions[newSymbol] = [target];
         }
     }
+
     render();
-    contextMenu();
 }
 cnv.oncontextmenu = function (e) {
     e.preventDefault();
