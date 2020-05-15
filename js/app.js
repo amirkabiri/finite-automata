@@ -265,51 +265,51 @@ cnv.oncontextmenu = function (e) {
             {
                 text: 'rename state',
                 onclick: () => {
+                    contextMenu();
                     const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
+                    if (!states.length) return false;
 
-                    if (states.length) {
-                        const state = states[0];
-                        const oldName = state.name;
-                        const newName = prompt('enter new name');
+                    const state = states[0];
+                    const oldName = state.name;
+                    const newName = prompt('enter new name');
 
-                        if (fa.states[newName] !== undefined) {
-                            alert(newName + ' already exists');
-                        } else {
-                            if (fa.start === oldName) {
-                                fa.start = newName;
-                            }
+                    if (fa.states[newName] !== undefined) {
+                        return alert(newName + ' already exists');
+                    }
 
-                            fa.states[newName] = fa.states[oldName];
-                            fa.states[newName].name = newName;
-                            delete fa.states[oldName];
+                    fa.states[newName] = fa.states[oldName];
+                    fa.states[newName].name = newName;
+                    delete fa.states[oldName];
 
-                            for (let key in fa.states) {
-                                if (!fa.states.hasOwnProperty(key)) continue;
+                    // rename transitions target of the other states
+                    for (let key in fa.states) {
+                        if (!fa.states.hasOwnProperty(key)) continue;
 
-                                const state = fa.states[key];
+                        const state = fa.states[key];
 
-                                if (state.name === oldName) {
-                                    state.name = newName;
-                                }
-                                for (let symbol in state.transitions) {
-                                    if (!state.transitions.hasOwnProperty(symbol)) continue;
+                        if (state.name === oldName) {
+                            state.name = newName;
+                        }
+                        for (let symbol in state.transitions) {
+                            if (!state.transitions.hasOwnProperty(symbol)) continue;
 
-                                    for (let s in state.transitions[symbol]) {
-                                        if (!state.transitions[symbol].hasOwnProperty(s)) continue;
+                            for (let s in state.transitions[symbol]) {
+                                if (!state.transitions[symbol].hasOwnProperty(s)) continue;
 
-                                        if (state.transitions[symbol][s] === oldName) {
-                                            state.transitions[symbol][s] = newName;
-                                        }
-                                    }
+                                if (state.transitions[symbol][s] === oldName) {
+                                    state.transitions[symbol][s] = newName;
                                 }
                             }
-
-                            save();
-                            render();
                         }
                     }
 
-                    contextMenu();
+                    // if oldName was start, make newName as start point
+                    if (fa.start === oldName) {
+                        fa.start = newName;
+                    }
+
+                    save();
+                    render();
                 },
             },
             {
