@@ -86,7 +86,8 @@ $('#convert2dfa').onclick = () => {
 
 $('#convertnfa2re').onclick = () => {
     try {
-        convertNFA2RE(fa);
+        const converter = new convertNFA2RE(fa);
+        fa = converter.run();
         render();
     } catch (e) {
         if ([IsNotNonDeterministicError, NoStartPointError, NoTerminalStateError, AlreadyConvertedToREError].some(errorType => e instanceof errorType)) {
