@@ -26,7 +26,7 @@ class convertNFA2RE {
      *  and make all terminal states to non-terminal states except new terminal states
      *
      * Step 3:
-     *  While count fa's states is greater than 2 repeate :
+     *  While count fa's states is greater than 2 repeat :
      *      find a state which has minimum number of transitions, as currentState
      *      iterate over all transitions of sates that has transition to current state and merge them with current state's transitions
      *      remove current state from fa
@@ -115,7 +115,7 @@ class convertNFA2RE {
                                 );
                             }
                         } else {
-                            // if there is a star transition it must be added to the new transition's sybol
+                            // if there is a star transition it must be added to the new transition's symbol
                             // new symbol =>
                             // "symbol_of_transition_of_origin(star_transition_symbols_joined_with_comma)*symbol_of_transition_of_current_state
                             originState.transitions[
@@ -138,7 +138,7 @@ class convertNFA2RE {
 
     /**
      * Merges same transitions of a state
-     * Same transitions are transitions that have same soure and destination states with different transition symbol
+     * Same transitions are transitions that have same source and destination states with different transition symbol
      *
      * @example
      * before :
@@ -175,7 +175,7 @@ class convertNFA2RE {
     }
 
     /**
-     * Get symbols of all transitions that soure state and destination state is this state
+     * Get symbols of all transitions that source state and destination state is this state
      * in other words return symbols of all star transitions of this state
      * @param {State} state
      * @returns {Array} Array of symbols of all star transitions
