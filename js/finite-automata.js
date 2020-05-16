@@ -1,7 +1,8 @@
 class FiniteAutomata {
     constructor({ start, states, symbols } = {}) {
         // this variable holds name of state or null
-        start && (this.start = start);
+        this._start = null;
+        if (start !== undefined) this.start = start;
 
         // this is an object which keys are state names
         // and values of the keys are an object of State class
@@ -17,26 +18,6 @@ class FiniteAutomata {
      */
     getStateNames() {
         return Object.keys(this.states);
-    }
-
-    /**
-     * This methods makes this.states object iterable using "for of" loop
-     * @private
-     */
-    _makeStatesObjectIterable() {
-        this.states[Symbol.iterator] = () => {
-            const states = Object.values(this.states);
-
-            return {
-                index: 0,
-                collection: states,
-                next() {
-                    if (this.index >= this.collection.length) return { done: true };
-
-                    return { done: false, value: this.collection[this.index++] };
-                },
-            };
-        };
     }
 
     /**
@@ -65,7 +46,7 @@ class FiniteAutomata {
         return this._start;
     }
     set start(start) {
-        if (!Object.keys(this._states).includes(start)) {
+        if (!Object.keys(this.states).includes(start)) {
             throw new StateNotFoundError(start + ' state does not exits in this finite automata');
         }
 
@@ -96,8 +77,8 @@ class FiniteAutomata {
             throw new StatesShouldBeObjectError();
         }
 
-        this._states = states;
-        this._makeStatesObjectIterable();
+        // make this.states iterable using "for of" loop
+        this._states = iterableObject(states);
     }
 
     /**
@@ -286,16 +267,12 @@ class FiniteAutomata {
         // If an fa has two states that start state is λ state and non-terminal
         // and the other state is only terminal state of fa
         // that fa is a GeneralizedFiniteAutomata
-        if (
+        return (
             Object.keys(this.states).length === 2 &&
             this.start === 'λ' &&
             Object.values(this.states).filter(state => state.name !== this.start)[0].terminal &&
             !this.states[this.start].terminal
-        ) {
-            return true;
-        }
-
-        return false;
+        );
     }
 
     /**
