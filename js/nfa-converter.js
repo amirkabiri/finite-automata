@@ -118,8 +118,12 @@ class convertNFA2RE {
                             // if there is a star transition it must be added to the new transition's symbol
                             // new symbol =>
                             // "symbol_of_transition_of_origin(star_transition_symbols_joined_with_comma)*symbol_of_transition_of_current_state
+
+                            let starTransitionSymbolsJoined =
+                                starTransitionSymbol.length > 1 ? '(' + starTransitionSymbol.join('+') + ')' : starTransitionSymbol.join('+');
+
                             originState.transitions[
-                                (originTransitionSymbol + '(' + starTransitionSymbol.join('+') + ')*' + currentStateTransitionSymbol).trim()
+                                (originTransitionSymbol + (starTransitionSymbolsJoined + '*') + currentStateTransitionSymbol).trim()
                             ] = currentStateTransition;
                         }
                     }
@@ -200,29 +204,9 @@ class convertNFA2RE {
      * @returns {State}
      */
     getNextState(fa) {
-        let result,
-            minTransitionCount = 0;
-        for (let name in fa.states) {
-            if (!fa.states.hasOwnProperty(name)) continue;
-            const state = fa.states[name];
-
-            if (!state || fa.start === name || state.terminal) {
-                continue;
-            }
-
-            let statesHasTransitionFromState = [];
-            for (let transitionName in state.transitions) {
-                if (!state.transitions.hasOwnProperty(transitionName)) continue;
-                const transition = state.transitions[transitionName];
-
-                statesHasTransitionFromState = [...new Set(transition.concat(statesHasTransitionFromState))];
-            }
-            if (minTransitionCount === 0 || (statesHasTransitionFromState.length !== 0 && statesHasTransitionFromState.length < minTransitionCount)) {
-                minTransitionCount = statesHasTransitionFromState.length;
-                result = state;
-            }
+        for (const state of fa.states) {
+            if (fa.start !== state.name && !state.terminal) return state;
         }
-        return result;
     }
 
     /**
@@ -234,18 +218,13 @@ class convertNFA2RE {
         const { fa } = this;
         let result = [];
 
-        for (let originStateName in fa.states) {
-            if (!fa.states.hasOwnProperty(originStateName)) continue;
-            const originState = fa.states[originStateName];
-
-            if (!originState || !this.isAnyTransitionBetween(originState, state)) {
-                continue;
+        for (let originState of fa.states) {
+            if (this.isAnyTransitionBetween(originState, state)) {
+                result.push(originState);
             }
-            result.push(originState);
-            result = [...new Set(result)];
         }
 
-        return result;
+        return [...new Set(result)];
     }
 
     /**
@@ -256,13 +235,8 @@ class convertNFA2RE {
      * @returns {Boolean} Returns true if there is any transition otherwise returns false
      */
     isAnyTransitionBetween(from, to) {
-        for (let transitionName in from.transitions) {
-            if (!from.transitions.hasOwnProperty(transitionName)) continue;
-            const transition = from.transitions[transitionName];
-
-            if (transition.includes(to.name)) {
-                return true;
-            }
+        for (let transition of Object.values(from.transitions)) {
+            if (transition.includes(to.name)) return true;
         }
         return false;
     }
@@ -273,15 +247,6 @@ class convertNFA2RE {
      * @returns {Array} Array of terminal states
      */
     getTerminalStates(fa) {
-        let result = [];
-        for (let name in fa.states) {
-            if (!fa.states.hasOwnProperty(name)) continue;
-            const state = fa.states[name];
-
-            if (state && state.terminal) {
-                result.push(state);
-            }
-        }
-        return result;
+        return Object.values(fa.states).filter(state => state.terminal);
     }
 }
