@@ -115,13 +115,16 @@ class convertNFA2RE {
                                 );
                             }
                         } else {
+                            // join symbols using +
+                            let starTransitionSymbolsJoined = '(' + starTransitionSymbol.join('+') + ')';
+                            // if starTransitionSymbol has one symbol , so there is no need for parentheses. example : ['a']
+                            if (starTransitionSymbol.length === 1 && starTransitionSymbol[0].length === 1) {
+                                starTransitionSymbolsJoined = starTransitionSymbol[0];
+                            }
+
                             // if there is a star transition it must be added to the new transition's symbol
                             // new symbol =>
                             // "symbol_of_transition_of_origin(star_transition_symbols_joined_with_comma)*symbol_of_transition_of_current_state
-
-                            let starTransitionSymbolsJoined =
-                                starTransitionSymbol.length > 1 ? '(' + starTransitionSymbol.join('+') + ')' : starTransitionSymbol.join('+');
-
                             originState.transitions[
                                 (originTransitionSymbol + (starTransitionSymbolsJoined + '*') + currentStateTransitionSymbol).trim()
                             ] = currentStateTransition;
