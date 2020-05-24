@@ -1,37 +1,55 @@
 function removeUselessStates(fa) {
-    let runAgain = false;
+    let allReachableStatesFromStart = getAllReachableStatesFromStart(fa);
+    for (let name in fa.states) {
+        const state = fa.states[name];
+        if(allReachableStatesFromStart.includes(state)) continue;
+        fa.removeState(state.name);
+    }
+    return fa;
+}
 
-    for (let target in fa.states) {
-        if (fa.start === target) continue;
-
-        let isTarget = false;
-
-        for (let name in fa.states) {
-            let breakMe = false;
-            if (name === target) continue;
-
-            for (let symbol in fa.states[name].transitions) {
-                const targets = fa.states[name].transitions[symbol];
-
-                if (targets.includes(target)) {
-                    isTarget = true;
-                    breakMe = true;
-                    break;
-                }
-            }
-
-            if (breakMe) break;
+/**
+ * This method uses the DFS algorithm to traversal the graph of states
+ * to find all states that are reachable from start state
+ * @param {FiniteAutomata} fa
+ * @returns {Array} Array of all states that are reachable from start state
+ */
+function getAllReachableStatesFromStart(fa) {
+    let state = fa.states[fa.start];
+    let visited = [];
+    let stack = [state];
+    while (stack.length > 0) {
+        if (!visited.includes(state)) {
+            let statesHasTransitionFromState = getStatesHasTransitionFrom(state);
+            stack.push(...statesHasTransitionFromState);
+            visited.push(state);
         }
+        state = stack.pop();
+    }
+    return visited;
+}
 
-        if (!isTarget) {
-            fa.removeState(target);
-            runAgain = true;
+/**
+ * Get all states that has transition from state
+ * @param {State} state origin state
+ * @returns {Array} Array of states that has transition from state
+ */
+function getStatesHasTransitionFrom(state) {
+    let result = [];
+    //TODO : Decuple this function from convertNFA2RE class
+    //       by moving out isAnyTransitionBetween method and some 
+    //       other common methods
+    let converter = new convertNFA2RE(fa);
+    for (let destinationStateName in fa.states) {
+        const destinationState = fa.states[destinationStateName];
+        if (!destinationState || !converter.isAnyTransitionBetween(state, destinationState)) {
+            continue;
         }
+        result.push(destinationState);
+        result = [...new Set(result)];
     }
 
-    if (runAgain) return removeUselessStates(fa);
-
-    return fa;
+    return result;
 }
 
 function minimizeDFA(dfa) {
