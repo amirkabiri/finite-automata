@@ -27,7 +27,12 @@ $('#reset').onclick = function () {
     if (!confirm('Are you sure? everything will be removed')) return;
 
     fa = new FiniteAutomata();
-    save();
+    
+    try{
+        localStorage.removeItem('fa');
+        localStorage.removeItem('mode');
+    }catch(e){}
+
     render();
 };
 
