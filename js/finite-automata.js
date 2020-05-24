@@ -1,14 +1,23 @@
 class FiniteAutomata {
     constructor({ start, states, symbols } = {}) {
         // this variable holds name of state or null
-        this._start = start || null;
+        this._start = null;
+        if (start !== undefined) this.start = start;
 
         // this is an object which keys are state names
         // and values of the keys are an object of State class
-        this._states = states || {};
+        this.states = states || {};
 
         // an array of symbols. example : ['a', 'b']
-        this._symbols = symbols || [];
+        this.symbols = symbols || [];
+    }
+
+    /**
+     * returns an array of state names
+     * @return {string[]}
+     */
+    getStateNames() {
+        return Object.keys(this.states);
     }
 
     /**
@@ -19,10 +28,7 @@ class FiniteAutomata {
     _predictSymbols() {
         const symbols = [];
 
-        for (let state in this._states) {
-            if (!this._states.hasOwnProperty(state)) continue;
-            const { transitions } = this._states[state];
-
+        for (const { transitions } of this.states) {
             for (let symbol in transitions) {
                 if (!transitions.hasOwnProperty(symbol)) continue;
                 if (symbol === '') continue;
@@ -40,7 +46,7 @@ class FiniteAutomata {
         return this._start;
     }
     set start(start) {
-        if (!Object.keys(this._states).includes(start)) {
+        if (!Object.keys(this.states).includes(start)) {
             throw new StateNotFoundError(start + ' state does not exits in this finite automata');
         }
 
@@ -71,7 +77,8 @@ class FiniteAutomata {
             throw new StatesShouldBeObjectError();
         }
 
-        this._states = states;
+        // make this.states iterable using "for of" loop
+        this._states = iterableObject(states);
     }
 
     /**
@@ -79,11 +86,7 @@ class FiniteAutomata {
      * @return {boolean}
      */
     isDFA() {
-        for (let name in this._states) {
-            if (!this._states.hasOwnProperty(name)) continue;
-
-            const { transitions } = this._states[name];
-
+        for (const { transitions } of this.states) {
             // if this state had lambda symbol
             // return false, that means this is not a dfa
             if (transitions[''] !== undefined) return false;
@@ -114,18 +117,23 @@ class FiniteAutomata {
             throw new InvalidJsonError('imported string is not a valid json');
         }
 
+        // clear previous data before importing
+        this.states = {};
+        this._start = null;
+        this.symbols = [];
+
         if (json.hasOwnProperty('states') && typeof json.states === 'object') {
             for (let key in json.states) {
                 if (!json.states.hasOwnProperty(key)) continue;
 
-                this._states[key] = new State(json.states[key]);
+                this.states[key] = new State(json.states[key]);
             }
         }
         if (json.hasOwnProperty('states') && json.hasOwnProperty('start') && Object.keys(json.states).includes(json.start)) {
             this._start = json.start;
         }
         if (json.hasOwnProperty('symbols') && Array.isArray(json.symbols)) {
-            this._symbols = json.symbols;
+            this.symbols = json.symbols;
         }
 
         return this;
@@ -137,9 +145,9 @@ class FiniteAutomata {
      */
     export() {
         return JSON.stringify({
-            start: this._start,
-            states: this._states,
-            symbols: this._symbols,
+            start: this.start,
+            states: this.states,
+            symbols: this.symbols,
         });
     }
 
@@ -150,7 +158,7 @@ class FiniteAutomata {
      * @return {array}
      */
     findNearestStates(x, y) {
-        return Object.values(this._states).filter(state => {
+        return Object.values(this.states).filter(state => {
             const distance = Math.sqrt(Math.pow(x - state.x, 2) + Math.pow(y - state.y, 2));
 
             return distance <= state.getRadius();
@@ -158,9 +166,9 @@ class FiniteAutomata {
     }
 
     _renderStartStateArrow(ctx) {
-        if (this._states[this._start] === undefined) return;
+        if (this.states[this.start] === undefined) return;
 
-        const state = this._states[this._start];
+        const state = this.states[this.start];
         const y = state.y;
         const x = state.x - state.getRadius();
 
@@ -181,23 +189,11 @@ class FiniteAutomata {
     render(ctx) {
         this._renderStartStateArrow(ctx);
 
-        for (let name in this._states) {
-            if (!this._states.hasOwnProperty(name)) continue;
+        for (let state of this.states) state.renderSelfSymbols(ctx);
 
-            this._states[name].renderSelfSymbols(ctx);
-        }
+        for (let state of this.states) state.renderSymbols(ctx);
 
-        for (let name in this._states) {
-            if (!this._states.hasOwnProperty(name)) continue;
-
-            this._states[name].renderSymbols(ctx);
-        }
-
-        for (let name in this._states) {
-            if (!this._states.hasOwnProperty(name)) continue;
-
-            this._states[name].renderState(ctx);
-        }
+        for (let state of this.states) state.renderState(ctx);
 
         return this;
     }
@@ -208,28 +204,25 @@ class FiniteAutomata {
      * @return {FiniteAutomata}
      */
     removeState(name) {
-        if (this._states[name] === undefined) {
+        if (this.states[name] === undefined) {
             throw new StateNotFoundError(name + ' state not found');
         }
 
         // if state was start point, make this._start null
-        if (name === this._start) {
+        if (name === this.start) {
             this._start = null;
         }
 
         // remove symbols from other states to this state
-        for (let key in this._states) {
-            if (!this._states.hasOwnProperty(key)) continue;
+        for (const { transitions } of this.states) {
+            for (let symbol in transitions) {
+                if (!transitions.hasOwnProperty(symbol)) continue;
 
-            const state = this._states[key];
-            for (let symbol in state.transitions) {
-                if (!state.transitions.hasOwnProperty(symbol)) continue;
-
-                state.transitions[symbol] = state.transitions[symbol].filter(target => target !== name);
+                transitions[symbol] = transitions[symbol].filter(target => target !== name);
             }
         }
 
-        delete this._states[name];
+        delete this.states[name];
         return this;
     }
 
@@ -239,12 +232,60 @@ class FiniteAutomata {
      * @return {FiniteAutomata}
      */
     addState(data) {
-        if (this._states[data.name] !== undefined) {
+        if (this.states[data.name] !== undefined) {
             throw new StateAlreadyExistsError(data.name + ' state already exits');
         }
 
-        this._states[data.name] = new State(data);
+        this.states[data.name] = new State(data);
 
         return this;
+    }
+
+    /**
+     * Checking if this FiniteAutomata has any terminal state
+     * @return {boolean}
+     */
+    hasAnyTerminalState() {
+        // Loop over all states and check if any state is terminal
+        for (let state of this.states) {
+            if (state.terminal) {
+                // One terminal state found
+                return true;
+            }
+        }
+
+        // No terminal state found
+        return false;
+    }
+
+    /**
+     * Checking if this FiniteAutomata is a GeneralizedFiniteAutomata
+     * GeneralizedFiniteAutomata is made after converting Non-deterministicFiniteAutomata to RegularExpression
+     * @return {boolean}
+     */
+    isGeneralizedFa() {
+        // If an fa has two states that start state is λ state and non-terminal
+        // and the other state is only terminal state of fa
+        // that fa is a GeneralizedFiniteAutomata
+        return (
+            Object.keys(this.states).length === 2 &&
+            this.start === 'λ' &&
+            Object.values(this.states).filter(state => state.name !== this.start)[0].terminal &&
+            !this.states[this.start].terminal
+        );
+    }
+
+    /**
+     * Check if this FiniteAutomata is a NFA
+     * @returns {boolean} Returns true if this FiniteAutomata is a NFA otherwise returns false
+     */
+    isNFA() {
+        /* for checking a FiniteAutomata is Non-Deterministic, we should check two factors :
+         *   1. first factor is that the fa has any lambda transition or not
+         *   2. second factor is that any state in fa, should not have exactly one transition by every symbol to another state
+         *
+         * we have already method this.isDFA that this factors are implemented there, so we are using that method here
+         */
+        return !this.isDFA();
     }
 }

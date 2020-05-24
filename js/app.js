@@ -84,6 +84,30 @@ $('#convert2dfa').onclick = () => {
     }
 };
 
+$('#convertnfa2re').onclick = () => {
+    try {
+        const converter = new convertNFA2RE(fa);
+        const resFA = converter.run();
+        let { transitions } = resFA.states[resFA.start];
+        let symbol;
+
+        for (symbol in transitions) {
+            if (!transitions.hasOwnProperty(symbol)) continue;
+            if (transitions[symbol].length) break;
+        }
+
+        if (confirm(`result : ${symbol} \n click ok to copy to clipboard`)) {
+            navigator.clipboard.writeText(symbol).then(() => alert('copied to clip'));
+        }
+    } catch (e) {
+        if (e instanceof CustomError) {
+            alert(e.message);
+        } else {
+            console.log(e);
+        }
+    }
+};
+
 $('#complement').onclick = () => {
     try {
         fa = dfaComplement(fa);
@@ -210,6 +234,7 @@ function onTransitionRemoveClick(data) {
 function onTransitionRenameClick(data) {
     contextMenu();
     const states = fa.findNearestStates(contextMenuPos.x, contextMenuPos.y);
+
     // no state selected, so terminate the rest of execution
     if (!states.length) return false;
 
