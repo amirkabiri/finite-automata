@@ -89,9 +89,9 @@ $('#convert2dfa').onclick = () => {
     }
 };
 
-$('#convertnfa2re').onclick = () => {
+$('#convert2re').onclick = () => {
     try {
-        const converter = new convertNFA2RE(fa);
+        const converter = new convert2RE(fa);
         const resFA = converter.run();
         let { transitions } = resFA.states[resFA.start];
         let symbol;
