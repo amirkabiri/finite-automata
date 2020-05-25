@@ -301,7 +301,8 @@ cnv.oncontextmenu = function (e) {
 
                     const state = states[0];
                     const oldName = state.name;
-                    const newName = prompt('enter new name');
+                    const newName = prompt('enter new name', oldName);
+                    if (newName === null || !newName.trim() || newName === oldName) return;
 
                     if (fa.states[newName] !== undefined) {
                         return alert(newName + ' already exists');
