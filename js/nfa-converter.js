@@ -55,7 +55,7 @@ class convertNFA2RE {
             terminal: true,
         };
 
-        let terminalStates = this.getTerminalStates(fa);
+        let terminalStates = getTerminalStates(fa);
         terminalStates.forEach(state => {
             if (state.transitions[''] === undefined) {
                 state.transitions[''] = [newTerminalState.name];
@@ -71,7 +71,7 @@ class convertNFA2RE {
             let currentState = this.getNextState(fa);
 
             // states that has transition to current state
-            let statesHasTransitionToCurrentState = this.getStatesHasTransitionTo(currentState);
+            let statesHasTransitionToCurrentState = getStatesHasTransitionTo(fa, currentState);
 
             // symbol of transitions that goes
             // from current state to current state itself (symbol of star transition)
@@ -210,46 +210,5 @@ class convertNFA2RE {
         for (const state of fa.states) {
             if (fa.start !== state.name && !state.terminal) return state;
         }
-    }
-
-    /**
-     * Get all states that has transition to state
-     * @param {State} state destination state
-     * @returns {Array} Array of states that has transition to state
-     */
-    getStatesHasTransitionTo(state) {
-        const { fa } = this;
-        let result = [];
-
-        for (let originState of fa.states) {
-            if (this.isAnyTransitionBetween(originState, state)) {
-                result.push(originState);
-            }
-        }
-
-        return [...new Set(result)];
-    }
-
-    /**
-     * Check if there is any transition between two states
-     * @param {State} from Source state
-     * @param {State} to Destination state
-     *
-     * @returns {Boolean} Returns true if there is any transition otherwise returns false
-     */
-    isAnyTransitionBetween(from, to) {
-        for (let transition of Object.values(from.transitions)) {
-            if (transition.includes(to.name)) return true;
-        }
-        return false;
-    }
-
-    /**
-     * Get all terminal states of fa
-     * @param {FiniteAutomata} fa
-     * @returns {Array} Array of terminal states
-     */
-    getTerminalStates(fa) {
-        return Object.values(fa.states).filter(state => state.terminal);
     }
 }
