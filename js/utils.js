@@ -1,3 +1,43 @@
+/**
+ * Get all states that has transition to state
+ * @param {State} state destination state
+ * @returns {Array} Array of states that has transition to state
+ */
+function getStatesHasTransitionTo(fa, state) {
+    let result = [];
+
+    for (let originState of fa.states) {
+        if (isAnyTransitionBetween(originState, state)) {
+            result.push(originState);
+        }
+    }
+
+    return [...new Set(result)];
+}
+
+/**
+ * Check if there is any transition between two states
+ * @param {State} from Source state
+ * @param {State} to Destination state
+ *
+ * @returns {Boolean} Returns true if there is any transition otherwise returns false
+ */
+function isAnyTransitionBetween(from, to) {
+    for (let transition of Object.values(from.transitions)) {
+        if (transition.includes(to.name)) return true;
+    }
+    return false;
+}
+
+/**
+ * Get all terminal states of fa
+ * @param {FiniteAutomata} fa
+ * @returns {Array} Array of terminal states
+ */
+function getTerminalStates(fa) {
+    return Object.values(fa.states).filter(state => state.terminal);
+}
+
 function createCanvas(width = 320, height = 160) {
     const canvas = document.createElement('canvas');
     canvas.width = width;

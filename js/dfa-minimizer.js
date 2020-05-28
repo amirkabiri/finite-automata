@@ -2,7 +2,7 @@ function removeUselessStates(fa) {
     let allReachableStatesFromStart = getAllReachableStatesFromStart(fa);
     for (let name in fa.states) {
         const state = fa.states[name];
-        if(allReachableStatesFromStart.includes(state)) continue;
+        if (allReachableStatesFromStart.includes(state)) continue;
         fa.removeState(state.name);
     }
     return fa;
@@ -36,13 +36,10 @@ function getAllReachableStatesFromStart(fa) {
  */
 function getStatesHasTransitionFrom(state) {
     let result = [];
-    //TODO : Decuple this function from convertNFA2RE class
-    //       by moving out isAnyTransitionBetween method and some 
-    //       other common methods
-    let converter = new convertNFA2RE(fa);
+
     for (let destinationStateName in fa.states) {
         const destinationState = fa.states[destinationStateName];
-        if (!destinationState || !converter.isAnyTransitionBetween(state, destinationState)) {
+        if (!destinationState || !isAnyTransitionBetween(state, destinationState)) {
             continue;
         }
         result.push(destinationState);
