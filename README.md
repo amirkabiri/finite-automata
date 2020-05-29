@@ -1,6 +1,7 @@
 ![demo](demo.png 'demo')
 
 # Finite Automata
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 this is a graphical interface for designing finite automata written in javascript
 
