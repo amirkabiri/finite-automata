@@ -4,12 +4,12 @@
  *   input : a(b+a+λ)+b(a+b(a+b))
  *   output : a(b|a)?|b(a|b(a|b))
  */
-class MachineReadableRegexConverter{
+class MachineReadableRegexConverter {
     constructor() {
         this.LAMBDA = 'λ';
     }
 
-    convert(regex){
+    convert(regex) {
         const parsedRegex = this.parseRegex(regex);
         const lambdaCharsConverted = this.convertLambda(parsedRegex, '+');
         const orSeparatorsConverted = this.convertOrSeparator(lambdaCharsConverted);
@@ -24,19 +24,19 @@ class MachineReadableRegexConverter{
      * @param {string} regex
      * @return {[]}
      */
-    parseRegex(regex){
+    parseRegex(regex) {
         const result = [];
         let i = 0;
         let temp = '';
 
-        while(i < regex.length){
+        while (i < regex.length) {
             const chr = regex[i];
 
-            switch(chr){
+            switch (chr) {
                 // if arrived to open parenthesis
                 case '(':
                     // if temp var is not empty, push it to result
-                    if(temp.length){
+                    if (temp.length) {
                         result.push(temp);
                         temp = '';
                     }
@@ -51,15 +51,15 @@ class MachineReadableRegexConverter{
                     break;
 
                 // hold all characters except parentheses in temp variable
-                default :
+                default:
                     temp += chr;
                     break;
             }
 
-            i ++;
+            i++;
         }
 
-        if(temp.length){
+        if (temp.length) {
             result.push(temp);
         }
 
@@ -82,16 +82,16 @@ class MachineReadableRegexConverter{
      * @param {number} i
      * @return {number}
      */
-    getCloseParIndex(regex, i = 0){
+    getCloseParIndex(regex, i = 0) {
         let parCounter = 0;
 
-        for(; i < regex.length; i ++){
-            if(regex[i] === '('){
-                parCounter ++;
-            }else if(regex[i] === ')'){
-                parCounter --;
+        for (; i < regex.length; i++) {
+            if (regex[i] === '(') {
+                parCounter++;
+            } else if (regex[i] === ')') {
+                parCounter--;
 
-                if(parCounter === 0) return i;
+                if (parCounter === 0) return i;
             }
         }
 
@@ -102,13 +102,13 @@ class MachineReadableRegexConverter{
      * Converts + or separator to |
      * @param regex
      */
-    convertOrSeparator(regex){
-        for(let i = 0; i < regex.length; i ++){
+    convertOrSeparator(regex) {
+        for (let i = 0; i < regex.length; i++) {
             let group = regex[i];
 
-            if(Array.isArray(group)){
+            if (Array.isArray(group)) {
                 regex[i] = this.convertOrSeparator(group);
-            }else if(typeof group === 'string'){
+            } else if (typeof group === 'string') {
                 regex[i] = group.replace(/\+/g, '|');
             }
         }
@@ -121,13 +121,13 @@ class MachineReadableRegexConverter{
      * @param regex
      * @param {string} orSeparator accepts '+' or '|'
      */
-    convertLambda(regex, orSeparator = '+'){
+    convertLambda(regex, orSeparator = '+') {
         let hasLambda = false;
 
-        for(let i = 0; i < regex.length; i++){
+        for (let i = 0; i < regex.length; i++) {
             let group = regex[i];
 
-            if(Array.isArray(group)){
+            if (Array.isArray(group)) {
                 // process subGroup recursively
                 const subGroup = this.convertLambda(group);
 
@@ -135,27 +135,27 @@ class MachineReadableRegexConverter{
                 // replace this group with ['a+b'] and put '?' in next index
                 // this action makes the result flatter and prettier
                 const lastItemOfSubGroup = subGroup[subGroup.length - 1];
-                if(subGroup.length === 2 && lastItemOfSubGroup === '?'){
+                if (subGroup.length === 2 && lastItemOfSubGroup === '?') {
                     // if next item is not exists, that means current is the last item
-                    if(regex[i + 1] === undefined){
+                    if (regex[i + 1] === undefined) {
                         // so push '?' to the regex
                         regex.push('?');
                     }
                     // if next item is an array, so insert '?' after current item
-                    else if(Array.isArray(regex[i + 1])){
+                    else if (Array.isArray(regex[i + 1])) {
                         // this code inserts an item before index of i + 1
                         regex.splice(i + 1, 0, '?');
                     }
                     // if next item is string, prepend '?' to the next item
-                    else if(typeof regex[i + 1] === 'string'){
+                    else if (typeof regex[i + 1] === 'string') {
                         regex[i + 1] = '?' + regex[i + 1];
                     }
                 }
-            }else if(typeof group === 'string'){
+            } else if (typeof group === 'string') {
                 group = group.split(orSeparator);
 
                 // if group have lambda character
-                if(group.includes(this.LAMBDA)){
+                if (group.includes(this.LAMBDA)) {
                     // enable hasLambda to add '?' character to the end of group
                     hasLambda = true;
                     // remove lambda character
@@ -165,7 +165,7 @@ class MachineReadableRegexConverter{
             }
         }
 
-        if(hasLambda) return [regex, '?'];
+        if (hasLambda) return [regex, '?'];
 
         return regex;
     }
@@ -178,13 +178,13 @@ class MachineReadableRegexConverter{
      * @param regex
      * @return {string}
      */
-    stringifyRegex(regex){
+    stringifyRegex(regex) {
         let result = '';
 
-        for(let group of regex){
-            if(Array.isArray(group)){
+        for (let group of regex) {
+            if (Array.isArray(group)) {
                 result += '(' + this.stringifyRegex(group) + ')';
-            }else if(typeof group === 'string'){
+            } else if (typeof group === 'string') {
                 result += group;
             }
         }
