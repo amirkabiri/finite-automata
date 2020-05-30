@@ -11,19 +11,12 @@ class State {
         this._transitions = transitions;
     }
     get transitions() {
-        // remove illegal transitions to prevent unexpected bugs
+        // fix illegal transitions
         for (let symbol in this._transitions) {
             if (!this._transitions.hasOwnProperty(symbol)) continue;
 
-            let states = this._transitions[symbol];
-            if (!Array.isArray(states)) {
-                delete this._transitions[symbol];
-                continue;
-            }
-
-            states = states.filter(state => typeof state === 'string');
-            if (states.length === 0) {
-                delete this._transitions[symbol];
+            if (!Array.isArray(this._transitions[symbol])) {
+                this._transitions[symbol] = [];
             }
         }
 
