@@ -7,6 +7,39 @@ class State {
         this.transitions = transitions || {};
     }
 
+    set transitions(transitions) {
+        this._transitions = transitions;
+    }
+    get transitions() {
+        // remove illegal transitions to prevent unexpected bugs
+        for (let symbol in this._transitions) {
+            if (!this._transitions.hasOwnProperty(symbol)) continue;
+
+            let states = this._transitions[symbol];
+            if (!Array.isArray(states)) {
+                delete this._transitions[symbol];
+                continue;
+            }
+
+            states = states.filter(state => typeof state === 'string');
+            if (states.length === 0) {
+                delete this._transitions[symbol];
+            }
+        }
+
+        return this._transitions;
+    }
+
+    toJSON() {
+        return {
+            transitions: this.transitions,
+            name: this.name,
+            x: this.x,
+            y: this.y,
+            terminal: this.terminal,
+        };
+    }
+
     translate(symbol, state) {
         if (this.transitions[symbol] === undefined) {
             this.transitions[symbol] = [];
