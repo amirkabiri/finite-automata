@@ -54,3 +54,8 @@ class AlreadyConvertedToREError extends CustomError {
         super(message);
     }
 }
+class GrammerIsNotCNFError extends CustomError {
+    constructor(message = 'grammer is not Chomsky Normal Form grammar') {
+        super(message);
+    }
+}
