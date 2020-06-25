@@ -56,3 +56,13 @@ class cykWordAcceptanceChecker {
         return result.length > 0 ? result.slice(0, -1) : result;
     }
 }
+
+
+const grammar = (new Grammar).parse(`
+S -> a | AB
+A -> a
+B -> b
+`);
+const exportedGrammarForCYK = grammar.exportForCYK();
+const CYK = new cykWordAcceptanceChecker(exportedGrammarForCYK.start, exportedGrammarForCYK.grammar, 'abc');
+console.log('CYK : ', CYK.check());
