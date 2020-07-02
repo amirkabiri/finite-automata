@@ -7,7 +7,7 @@ this is a graphical interface for designing finite automata written in javascrip
 
 # Online Demo
 
-click [here](https://amirkabiri.github.io/finite-automata/index.html) to see online demo
+click [here](https://fa.akdev.ir) to see online demo
 
 # Tasks
 
