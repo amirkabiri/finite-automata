@@ -8,8 +8,8 @@ class cykWordAcceptanceChecker {
         this.n = string.length;
     }
 
-    //TODO: check if grammer is Chomsky Normal Form grammer
-    isGrammerCNF() {
+    //TODO: check if grammar is Chomsky Normal Form grammar
+    isGrammarCNF() {
         return true;
     }
 
@@ -23,7 +23,7 @@ class cykWordAcceptanceChecker {
     }
 
     check() {
-        if (!this.isGrammerCNF()) throw new GrammerIsNotCNFError();
+        if (!this.isGrammarCNF()) throw new GrammarIsNotCNFError();
         if (this.isAnyNonTerminalCharacterInWord()) throw new NonTerminalCharacterInWordError();
         
         for (let k = 1; k <= this.n; k++) {
