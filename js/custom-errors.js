@@ -59,3 +59,8 @@ class GrammerIsNotCNFError extends CustomError {
         super(message);
     }
 }
+class NonTerminalCharacterInWordError extends CustomError {
+    constructor(message = 'word contains non-terminal characters') {
+        super(message);
+    }
+}

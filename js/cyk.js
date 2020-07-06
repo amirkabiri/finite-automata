@@ -1,7 +1,8 @@
 class cykWordAcceptanceChecker {
-    constructor(start, grammar, string) {
+    constructor(start, grammar, terminals, string) {
         this.start = start;
         this.grammar = grammar;
+        this.terminals = terminals;
         this.string = string;
         this.V = {};
         this.n = string.length;
@@ -12,10 +13,19 @@ class cykWordAcceptanceChecker {
         return true;
     }
 
-    check() {
-        if(!this.isGrammerCNF())
-            throw new GrammerIsNotCNFError();
+    /**
+     * Check if word (this.string) contains a non-terminal character or not.
+     * 
+     * @returns {Boolean} Returns true if there is a non-terminal character in the string
+     */
+    isAnyNonTerminalCharacterInWord() {
+        return this.string.split('').some(c => !this.terminals.includes(c));
+    }
 
+    check() {
+        if (!this.isGrammerCNF()) throw new GrammerIsNotCNFError();
+        if (this.isAnyNonTerminalCharacterInWord()) throw new NonTerminalCharacterInWordError();
+        
         for (let k = 1; k <= this.n; k++) {
             for (let i = 1; i <= this.n - k + 1; i++) {
                 let j = i + k - 1;
@@ -57,12 +67,20 @@ class cykWordAcceptanceChecker {
     }
 }
 
+//----------------------------------------------------------------
+// How to use cykWordAcceptanceChecker :
+// Just uncomment the lines below.
 
-const grammar = (new Grammar).parse(`
-S -> a | AB
-A -> a
-B -> b
+/*
+const grammar = new Grammar().parse(`
+S -> AB | BC
+A -> BA | a
+B -> CC | b
+C -> AB | a
 `);
 const exportedGrammarForCYK = grammar.exportForCYK();
-const CYK = new cykWordAcceptanceChecker(exportedGrammarForCYK.start, exportedGrammarForCYK.grammar, 'abc');
+const CYK = new cykWordAcceptanceChecker(exportedGrammarForCYK.start, exportedGrammarForCYK.grammar, exportedGrammarForCYK.terminals, 'baaba');
 console.log('CYK : ', CYK.check());
+*/
+
+//----------------------------------------------------------------

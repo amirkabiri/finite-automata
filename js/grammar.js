@@ -614,7 +614,8 @@ class Grammar{
 
         return {
             grammar : exportGrammar,
-            start : this.start
+            start : this.start,
+            terminals : this.terminals
         };
     }
 }
