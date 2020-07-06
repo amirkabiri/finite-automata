@@ -243,8 +243,12 @@ function onTransitionRemoveClick(data) {
 
     if (symbol in state.transitions && state.transitions[symbol].includes(target)) {
         state.transitions[symbol] = state.transitions[symbol].filter(s => s !== target);
+        if (state.transitions[symbol].length === 0) {
+            delete state.transitions[symbol];
+        }
     }
 
+    save();
     render();
 }
 function onTransitionRenameClick(data) {
@@ -276,6 +280,7 @@ function onTransitionRenameClick(data) {
         }
     }
 
+    save();
     render();
 }
 cnv.oncontextmenu = function (e) {
