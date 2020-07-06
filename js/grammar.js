@@ -151,7 +151,8 @@ class Grammar{
     }
 
     simplify(){
-        return this.removeUnreachableVariables()
+        return this
+            .removeUnreachableVariables()
             .removeLoopVariables()
             .replaceLambda()
             .removeUnitProductions();
@@ -173,41 +174,10 @@ class Grammar{
 
                 statement = statement[0];
 
-                for(let v in grammar){
-                    if(! grammar.hasOwnProperty(v)) continue;
-
-                    for(let statementIndex in grammar[v]){
-                        if(! grammar[v].hasOwnProperty(statementIndex)) continue;
-                        const s = grammar[v][statementIndex];
-                        const variableIndexes = [];
-
-                        for(let ei in s){
-                            if(s[ei].value === variable){
-                                variableIndexes.push(ei);
-                            }
-                        }
-
-                        if(! variableIndexes.length) continue;
-
-                        for(let set of powerSet(variableIndexes)){
-                            if(! set.length) continue;
-
-                            let newStatement = s.map(e => e.value);
-                            set.forEach(index => {
-                                newStatement[index] = statement.value;
-                            });
-
-                            newStatement = newStatement.map(e => new GrammarExpression(e));
-
-                            // if statement is equals to variable, dont push it
-                            if(newStatement.length === 1 && newStatement[0].value === v) continue;
-
-                            grammar[v].push(newStatement);
-                        }
-
-                    }
-                }
-
+                grammar[variable] = [
+                    ...grammar[variable],
+                    ...grammar[statement.value]
+                ].filter(s => !(s.length === 1 && s[0].value === statement.value));
             }
         }
 
@@ -240,7 +210,7 @@ class Grammar{
     }
 
     statementIsUnitProduction(statement){
-        return !(statement.length > 1 || new GrammarExpression(statement[0].value).isTerminal());
+        return !(statement.length !== 1 || new GrammarExpression(statement[0].value).isTerminal());
     }
 
     replaceLambda(){
@@ -381,7 +351,7 @@ class Grammar{
             if(! grammar.hasOwnProperty(variable)) continue;
 
             grammar[variable] = grammar[variable].map(statement => {
-                if(statement.length === 1 && statement[0].value === start){
+                if(statement.length === 1 && statement[0].value === variable){
                     return '';
                 }
 
@@ -507,7 +477,7 @@ class Grammar{
 
 
         for(let variable of simplified.variables){
-            for(let statementIndex of grammar[variable]){
+            for(let statementIndex in grammar[variable]){
                 const statement = grammar[variable][statementIndex];
 
                 if(simplified.statementIsValidForChomsky({ statement, variable, start })){
@@ -619,3 +589,16 @@ class Grammar{
         };
     }
 }
+
+
+const grammar = new Grammar().parse(`
+S -> b | A
+A -> a | S | aA
+`);
+console.log(grammar.stringify());
+
+const simplifiedGrammar = grammar.simplify();
+console.log(simplifiedGrammar.stringify());
+
+const chomskyNormalForm = simplifiedGrammar.toCNF();
+console.log(chomskyNormalForm.stringify())
