@@ -64,3 +64,8 @@ class NonTerminalCharacterInWordError extends CustomError {
         super(message);
     }
 }
+class InvalidTuringMachineError extends CustomError {
+    constructor(message = 'turing machine is invalid') {
+        super(message);
+    }
+}
