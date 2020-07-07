@@ -1,35 +1,12 @@
-function deepClone(i){
-    return JSON.parse(
-        JSON.stringify(i)
-    );
-}
-function powerSet(theArray){
-    return theArray.reduce(
-        (subsets, value) => subsets.concat(
-            subsets.map(set => [value,...set])
-        ),
-        [[]]
-    );
-}
-
-
-class GrammarExpression{
-    constructor(value){
-        this.value = value;
-    }
-
-    isTerminal(){
-        const { value } = this;
-
-        if(/^[0-9]$/.test(value)) return true;
-
-        return value.toLowerCase() === value;
-    }
-
-    isVariable(){
-        return ! this.isTerminal();
-    }
-}
+/**
+ * Grammar Class
+ * contains :
+ *    1. grammar parser : parses plain text to grammar
+ *    2. grammar simplifier : simplifies lambda , unit productions, loop variables, unreachable variable
+ *    3. grammar optimizer
+ *    4. CNF converter : converts grammar to Chomsky normal form
+ *    5. GNF converter : converts grammar to Greibach normal form
+ */
 
 class Grammar{
     constructor({ start, grammar } = {}){
@@ -75,6 +52,16 @@ class Grammar{
 
     optimizeGrammar(grammar){
         if(!grammar) grammar = {};
+
+        // removing useless lambdas , example : A -> aλ
+        // result : A -> a
+        for(let variable in grammar){
+            grammar[variable] = grammar[variable].map(statement => {
+                if(statement.length === 1) return statement;
+
+                return statement.filter(e => e.value !== this.LAMBDA_SYMBOL);
+            });
+        }
 
         // if expressions is not instance of GrammarExpression class, create and insert new instance of this class
         for(let variable in grammar){
@@ -151,10 +138,11 @@ class Grammar{
     }
 
     simplify(){
-        return this.removeUnreachableVariables()
+        return this
             .removeLoopVariables()
-            .replaceLambda()
-            .removeUnitProductions();
+            .removeUnreachableVariables()
+            .removeUnitProductions()
+            .replaceLambda();
     }
 
     removeUnitProductions(){
@@ -173,41 +161,10 @@ class Grammar{
 
                 statement = statement[0];
 
-                for(let v in grammar){
-                    if(! grammar.hasOwnProperty(v)) continue;
-
-                    for(let statementIndex in grammar[v]){
-                        if(! grammar[v].hasOwnProperty(statementIndex)) continue;
-                        const s = grammar[v][statementIndex];
-                        const variableIndexes = [];
-
-                        for(let ei in s){
-                            if(s[ei].value === variable){
-                                variableIndexes.push(ei);
-                            }
-                        }
-
-                        if(! variableIndexes.length) continue;
-
-                        for(let set of powerSet(variableIndexes)){
-                            if(! set.length) continue;
-
-                            let newStatement = s.map(e => e.value);
-                            set.forEach(index => {
-                                newStatement[index] = statement.value;
-                            });
-
-                            newStatement = newStatement.map(e => new GrammarExpression(e));
-
-                            // if statement is equals to variable, dont push it
-                            if(newStatement.length === 1 && newStatement[0].value === v) continue;
-
-                            grammar[v].push(newStatement);
-                        }
-
-                    }
-                }
-
+                grammar[variable] = [
+                    ...grammar[variable],
+                    ...grammar[statement.value]
+                ].filter(s => !(s.length === 1 && s[0].value === statement.value));
             }
         }
 
@@ -240,7 +197,7 @@ class Grammar{
     }
 
     statementIsUnitProduction(statement){
-        return !(statement.length > 1 || new GrammarExpression(statement[0].value).isTerminal());
+        return !(statement.length !== 1 || new GrammarExpression(statement[0].value).isTerminal());
     }
 
     replaceLambda(){
@@ -356,8 +313,16 @@ class Grammar{
             delete grammar[variable];
         }
         for(let variable in grammar){
-            for(let i in grammar[variable]){
-                grammar[variable][i] = grammar[variable][i].filter(expression => !variables.includes(expression.value));
+            if(! grammar.hasOwnProperty(variable)) continue;
+
+            const statements = grammar[variable];
+
+            for(let statementID = statements.length - 1; statementID > -1; statementID --){
+                const statement = statements[statementID];
+
+                if(statement.some(e => variables.includes(e.value))){
+                    statements.splice(statementID, 1);
+                }
             }
         }
 
@@ -381,7 +346,7 @@ class Grammar{
             if(! grammar.hasOwnProperty(variable)) continue;
 
             grammar[variable] = grammar[variable].map(statement => {
-                if(statement.length === 1 && statement[0].value === start){
+                if(statement.length === 1 && statement[0].value === variable){
                     return '';
                 }
 
@@ -403,6 +368,10 @@ class Grammar{
         return grammarObj.removeVariables(unreachableVariables);
     }
 
+    /**
+     * Converts grammar to string
+     * @return {string|string}
+     */
     stringify(){
         let out = '';
         const variables = [...this.variables.filter(variable => variable !== this.start)];
@@ -420,6 +389,10 @@ class Grammar{
         return out;
     }
 
+    /**
+     * Returns array of reachable variables from start variable
+     * @return {Array}
+     */
     reachableVariables(){
         const { grammar } = this;
         const visited = [];
@@ -489,6 +462,10 @@ class Grammar{
         return true;
     }
 
+    /**
+     * Converts grammar to Chomsky Normal Form
+     * @return {Grammar}
+     */
     toCNF(){
         let start = this.start;
         let grammar = deepClone(this.grammar);
@@ -500,14 +477,12 @@ class Grammar{
             grammar[start] = [[new GrammarExpression(prevStart)]];
         }
 
-
         const simplified = new Grammar({ start, grammar }).simplify();
         grammar = simplified.grammar;
         start = simplified.start;
 
-
         for(let variable of simplified.variables){
-            for(let statementIndex of grammar[variable]){
+            for(let statementIndex in grammar[variable]){
                 const statement = grammar[variable][statementIndex];
 
                 if(simplified.statementIsValidForChomsky({ statement, variable, start })){
@@ -515,7 +490,7 @@ class Grammar{
                 }
 
                 if(statement[0].isTerminal()){
-                    let find = simplified.findVariable(statement[0].value);
+                    let find = simplified.findVariable(statement[0].value, true);
 
                     if(find === null || grammar[find].length !== 1){
                         find = simplified.unusedVariableNames.shift();
@@ -525,7 +500,7 @@ class Grammar{
                     grammar[variable][statementIndex][0] = new GrammarExpression(find);
 
                     if(! simplified.statementIsValidForChomsky({ statement, variable, start})){
-                        find = simplified.findVariable(statement.slice(1).map(({ value }) => value).join(''));
+                        find = simplified.findVariable(statement.slice(1).map(({ value }) => value).join(''), true);
 
                         if(find === null || grammar[find].length !== 1){
                             find = simplified.unusedVariableNames.shift();
@@ -535,7 +510,7 @@ class Grammar{
                         grammar[variable][statementIndex] = [statement[0], new GrammarExpression(find)];
                     }
                 }else{
-                    let find = simplified.findVariable(statement.slice(1).map(({ value }) => value).join(''));
+                    let find = simplified.findVariable(statement.slice(1).map(({ value }) => value).join(''), true);
 
                     if(find === null || grammar[find].length !== 1){
                         find = simplified.unusedVariableNames.shift();
@@ -552,9 +527,18 @@ class Grammar{
         return new Grammar({ start, grammar });
     }
 
-    findVariable(statement){
+    /**
+     * Finds variable with special statement
+     * if strict is true, finds a variable with length of 1
+     * @param statement
+     * @param strict
+     * @return {string|null}
+     */
+    findVariable(statement, strict = false){
+        const searchMethod = strict ? 'every' : 'some';
+
         for(let variable of this.variables){
-            if(this.grammar[variable].some(s => s.map(({ value }) => value).join('') === statement)){
+            if(this.grammar[variable][searchMethod](s => s.map(({ value }) => value).join('') === statement)){
                 return variable;
             }
         }
@@ -583,7 +567,10 @@ class Grammar{
         return false;
     }
 
-
+    /**
+     * Checks Grammar is in form of Greibach or not
+     * @return {boolean}
+     */
     isGNF(){
         const grammar = this.grammar;
 
@@ -604,6 +591,139 @@ class Grammar{
         return true;
     }
 
+    removeLeftRecursions(){
+        let start = this.start;
+        let grammar = this.grammarDeepClone();
+        let variables = Object.keys(grammar);
+        let unusedVariables = this.unusedVariableNames;
+
+        // removing left recursions
+        for(let variable of variables) {
+            const statements = grammar[variable];
+
+            for(let statementID = statements.length - 1; statementID > -1; statementID --) {
+                const statement = statements[statementID];
+
+                // if statement.length is 1 , this shows that grammar is not simplified
+                if (statement[0].value !== variable) continue;
+
+                const leftRecursionStatement = statements.splice(statementID, 1);
+
+                const newVariable = unusedVariables.shift();
+                grammar[newVariable] = [
+                    [...leftRecursionStatement[0].slice(1), new GrammarExpression(newVariable)],
+                    [new GrammarExpression(this.LAMBDA_SYMBOL)]
+                ];
+
+                const statementsLength = statements.length;
+                for(let SID = 0; SID < statementsLength; SID ++){
+                    statements.push([
+                        ...statements[SID],
+                        new GrammarExpression(newVariable)
+                    ]);
+                }
+            }
+        }
+
+        // doing simplification stuff, because removing left recursions maybe caused to generate lambda
+        return new Grammar({ start, grammar }).simplify();
+    }
+
+    /**
+     * Converts Grammar to Greibach Normal Form
+     * @return {Grammar}
+     */
+    toGNF(){
+        if(this.isGNF()) return this;
+
+        // simplification and removing left recursions
+        const self = this.simplify().removeLeftRecursions();
+
+        let start = self.start;
+        let grammar = self.grammarDeepClone();
+        let variables = Object.keys(grammar);
+        let unusedVariables = self.unusedVariableNames;
+
+        for(let variableID = variables.length - 1; variableID > -1; variableID --){
+            const variable = variables[variableID];
+            const statements = grammar[variable];
+
+            for(let statementID = statements.length - 1; statementID > -1; statementID --){
+                const statement = statements[statementID];
+
+                // if first token of statement is a variable
+                if(statement[0].isVariable()){
+                    statements.splice(statementID, 1);
+
+                    const VAR = statement[0].value;
+
+                    for(let s of grammar[VAR]){
+                        statements.push([
+                            ...s,
+                            ...statement.slice(1)
+                        ]);
+                    }
+
+                    variableID ++;
+                    break;
+                }
+
+                for(let expressionID = 1; expressionID < statement.length; expressionID ++) {
+                    const expression = statement[expressionID];
+
+                    if(expression.isVariable()) continue;
+
+                    // if expression is terminal, we should create a variable or find a proper one
+                    let VAR = null;
+
+                    // first, let's see that a proper variable exists or not
+                    for(let v in grammar){
+                        if(! grammar.hasOwnProperty(v)) continue;
+
+                        if(grammar[v].length !== 1) continue;
+                        if(grammar[v][0].length !== 1) continue;
+                        if(grammar[v][0][0].value !== expression.value) continue;
+
+                        VAR = v;
+                    }
+
+                    // if we can't find a proper one, let's create
+                    if(VAR === null){
+                        VAR = unusedVariables.shift();
+                        grammar[VAR] = [
+                            [new GrammarExpression(expression.value)]
+                        ];
+                    }
+
+                    statement[expressionID] = new GrammarExpression(VAR);
+                }
+            }
+        }
+
+        return new Grammar({ start, grammar });
+    }
+
+    /**
+     * Returns a standard deep clone of grammar, default grammar is this.grammar
+     * @param grammar
+     * @return {*}
+     */
+    grammarDeepClone(grammar = this.grammar){
+        grammar = deepClone(grammar);
+
+        for(let variable in grammar){
+            if(! grammar.hasOwnProperty(variable)) continue;
+
+            for(let statementID in grammar[variable]){
+                if(! grammar[variable].hasOwnProperty(statementID)) continue;
+
+                grammar[variable][statementID] = grammar[variable][statementID].map(({ value }) => new GrammarExpression(value));
+            }
+        }
+
+        return grammar;
+    }
+
     exportForCYK(){
         const { grammar } = this;
         const exportGrammar = {};
@@ -618,4 +738,234 @@ class Grammar{
             terminals : this.terminals
         };
     }
+
+
+    /**
+     * Checking grammar is Left-Linear
+     * According to Wikipedia:
+     *      left-linear grammar is a special type of linear grammar.
+     *      the left-linear or left regular grammars, in which all non-terminals in right hand sides are at the left ends.
+     *      https://en.wikipedia.org/wiki/Linear_grammar
+     * @return {boolean}
+     */
+    isLeftLinear(){
+        const { variables, grammar } = this;
+
+        for(let variable of variables){
+            for(let statement of grammar[variable]){
+                const statementVariables = statement.filter(e => e.isVariable());
+
+                if(statementVariables.length > 1) return false;
+                if(statementVariables.length === 1 && statement[0].isTerminal()) return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Checking grammar is Right-Linear
+     * According to Wikipedia:
+     *      right-linear grammar is a special type of linear grammar.
+     *      the right-linear or right regular grammars, in which all nonterminals in right hand sides are at the right ends.
+     *      https://en.wikipedia.org/wiki/Linear_grammar
+     * @return {boolean}
+     */
+    isRightLinear(){
+        const { variables, grammar } = this;
+
+        for(let variable of variables){
+            for(let statement of grammar[variable]){
+                const statementVariables = statement.filter(e => e.isVariable());
+
+                if(statementVariables.length > 1) return false;
+                if(statementVariables.length === 1 && statement[statement.length - 1].isTerminal()) return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Checking grammar is Linear
+     * According to Wikipedia :
+     *      a linear grammar is a context-free grammar that has at most one non-terminal in the right hand side of each of its productions.
+     *      https://en.wikipedia.org/wiki/Linear_grammar
+     * @return {boolean}
+     */
+    isLinear(){
+        const { variables, grammar } = this;
+
+        for(let variable of variables){
+            for(let statement of grammar[variable]){
+                const statementVariables = statement.filter(e => e.isVariable());
+
+                if(statementVariables.length > 1) return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Checking grammar is regular
+     * @return {boolean}
+     */
+    isRegular(){
+        return this.isLeftLinear() || this.isRightLinear();
+    }
+
+    /**
+     * Check grammar is Context Free or not
+     * @return {boolean}
+     */
+    isContextFree(){
+        return this.variables.every(variable => variable.length === 1);
+    }
+
+    /**
+     * Checks grammar has potential to be regular or not
+     * every production must have at most 1 variable and that variable must be at start or at end of production
+     * this method doesn't guarantee that the grammar is regular
+     * @return {boolean}
+     */
+    mayBeRegular(){
+        if(! this.isContextFree() || ! this.isLinear()) return false;
+
+        const { variables, grammar } = this;
+
+        for(let variable of variables){
+            for(let statement of grammar[variable]){
+                const statementVariables = statement.filter(e => e.isVariable());
+
+                if(statementVariables.length > 1) return false;
+
+                if(statementVariables.length === 0) continue;
+
+                if(statement[0].isVariable() || statement[statement.length - 1].isVariable()) continue;
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    toRightLinear(){
+        const { grammar, start, variables, unusedVariableNames } = this.removeLeftRecursions();
+        let stack = [];
+
+        for(let variable of variables){
+            const statements = grammar[variable];
+
+            for(let statementID = statements.length - 1; statementID > -1; statementID --){
+                const statement = statements[statementID];
+                if(statement[0].isTerminal()) continue;
+
+                const oldVar = statement[0].value;
+                const newVar = unusedVariableNames.shift();
+                stack.push([oldVar, newVar, statement.slice(1)]);
+
+                statements[statementID] = [new GrammarExpression(newVar)];
+            }
+        }
+
+        while(stack.length){
+            const [oldVar, newVar, stackStatement] = stack.pop();
+
+            grammar[newVar] = [];
+
+            for(let statement of grammar[oldVar]){
+                statement = statement.map((e, i) => {
+                    if(e.value === oldVar) return new GrammarExpression(newVar);
+
+                    if(e.isVariable()){
+                        const oldVar2 = e.value;
+                        const newVar2 = unusedVariableNames.shift();
+
+                        stack.push([oldVar2, newVar2, stackStatement]);
+
+                        return new GrammarExpression(newVar2);
+                    }
+
+                    return new GrammarExpression(e.value);
+                });
+
+                const statementIsTerminal = !statement.filter(e => e.isVariable()).length;
+
+                if(statementIsTerminal){
+                    grammar[newVar].push([
+                        ...statement,
+                        ...stackStatement
+                    ]);
+                }else{
+                    grammar[newVar].push(statement);
+                }
+            }
+        }
+
+        return new Grammar({ start, grammar }).simplify();
+    }
 }
+
+function deepClone(i){
+    return JSON.parse(
+        JSON.stringify(i)
+    );
+}
+function powerSet(theArray){
+    return theArray.reduce(
+        (subsets, value) => subsets.concat(
+            subsets.map(set => [value,...set])
+        ),
+        [[]]
+    );
+}
+
+
+class GrammarExpression{
+    constructor(value){
+        this.value = value;
+    }
+
+    isTerminal(){
+        const { value } = this;
+
+        if(/^[0-9]$/.test(value)) return true;
+
+        return value.toLowerCase() === value;
+    }
+
+    isVariable(){
+        return ! this.isTerminal();
+    }
+}
+
+
+// let grammar = new Grammar().parse(`
+// S -> Aa
+// A -> Ab | b
+// `).simplify();
+// console.log(grammar.stringify());
+//
+// const rightLinearGrammar = grammar.toRightLinear();
+// console.log(rightLinearGrammar.stringify());
+
+/*
+const grammar = new Grammar().parse(`
+S -> aAB | a | bCA
+A -> Aa | bB | B | λ
+B -> bB | A
+C -> CB | AC
+`);
+console.log('origin grammar\n', grammar.stringify());
+
+const simplifiedGrammar = grammar.simplify();
+console.log('simplified grammar\n', simplifiedGrammar.stringify());
+
+const chomskyNormalForm = grammar.toCNF();
+console.log('chomsky normal form\n', chomskyNormalForm.stringify());
+
+const greibachNormalForm = grammar.toGNF();
+console.log('greibach normal form\n', greibachNormalForm.stringify());
+*/

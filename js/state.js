@@ -7,6 +7,32 @@ class State {
         this.transitions = transitions || {};
     }
 
+    set transitions(transitions) {
+        this._transitions = transitions;
+    }
+    get transitions() {
+        // fix illegal transitions
+        for (let symbol in this._transitions) {
+            if (!this._transitions.hasOwnProperty(symbol)) continue;
+
+            if (!Array.isArray(this._transitions[symbol])) {
+                this._transitions[symbol] = [];
+            }
+        }
+
+        return this._transitions;
+    }
+
+    toJSON() {
+        return {
+            transitions: this.transitions,
+            name: this.name,
+            x: this.x,
+            y: this.y,
+            terminal: this.terminal,
+        };
+    }
+
     translate(symbol, state) {
         if (this.transitions[symbol] === undefined) {
             this.transitions[symbol] = [];

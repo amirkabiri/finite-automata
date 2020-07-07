@@ -64,3 +64,13 @@ class NonTerminalCharacterInWordError extends CustomError {
         super(message);
     }
 }
+class InvalidTuringMachineError extends CustomError {
+    constructor(message = 'turing machine is invalid') {
+        super(message);
+    }
+}
+class NotDPDAError extends CustomError {
+    constructor(message = 'pda is not deterministic (DPDA)') {
+        super(message);
+    }
+}
