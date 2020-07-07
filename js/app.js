@@ -23,15 +23,42 @@ let fa = new FiniteAutomata();
 fa.import(load());
 render();
 
+$('#test').onclick = function () {
+    try {
+        const nfa2reConverter = new convertNFA2RE(fa);
+        const resFA = nfa2reConverter.run();
+        let { transitions } = resFA.states[resFA.start];
+        let symbol;
+
+        for (symbol in transitions) {
+            if (!transitions.hasOwnProperty(symbol)) continue;
+            if (transitions[symbol].length) break;
+        }
+
+        const machineReadableRegexConverter = new MachineReadableRegexConverter();
+        symbol = machineReadableRegexConverter.convert(symbol);
+        const regex = new RegExp(`^${symbol}$`);
+
+        const string = prompt('enter string you want to test : ');
+        if (string && string.trim()) {
+            alert(regex.test(string.trim()) ? 'accepted' : 'failed');
+        }
+    } catch (e) {
+        handleError(e);
+    }
+};
+
 $('#reset').onclick = function () {
     if (!confirm('Are you sure? everything will be removed')) return;
 
     fa = new FiniteAutomata();
-    
-    try{
+
+    try {
         localStorage.removeItem('fa');
         localStorage.removeItem('mode');
-    }catch(e){}
+    } catch (e) {
+        handleError(e);
+    }
 
     render();
 };
@@ -58,11 +85,7 @@ $('#minimizedfa').onclick = () => {
         fa = minimizeDFA(fa);
         render();
     } catch (e) {
-        if (e instanceof IsNotDeterministicError) {
-            alert(e.message);
-        } else {
-            console.log(e);
-        }
+        handleError(e);
     }
 };
 
@@ -81,11 +104,7 @@ $('#convert2dfa').onclick = () => {
         fa = removeUselessStates(fa);
         render();
     } catch (e) {
-        if (e instanceof NoStartPointError) {
-            alert(e.message);
-        } else {
-            console.log(e);
-        }
+        handleError(e);
     }
 };
 
@@ -105,11 +124,7 @@ $('#convert2re').onclick = () => {
             navigator.clipboard.writeText(symbol).then(() => alert('copied to clip'));
         }
     } catch (e) {
-        if (e instanceof CustomError) {
-            alert(e.message);
-        } else {
-            console.log(e);
-        }
+        handleError(e);
     }
 };
 
@@ -118,11 +133,7 @@ $('#complement').onclick = () => {
         fa = dfaComplement(fa);
         render();
     } catch (e) {
-        if (e instanceof IsNotDeterministicError) {
-            alert(e.message);
-        } else {
-            console.log(e);
-        }
+        handleError(e);
     }
 };
 
@@ -301,7 +312,8 @@ cnv.oncontextmenu = function (e) {
 
                     const state = states[0];
                     const oldName = state.name;
-                    const newName = prompt('enter new name');
+                    const newName = prompt('enter new name', oldName);
+                    if (newName === null || !newName.trim() || newName === oldName) return;
 
                     if (fa.states[newName] !== undefined) {
                         return alert(newName + ' already exists');
@@ -365,6 +377,8 @@ cnv.oncontextmenu = function (e) {
 
         const removeTransitionsMenu = [];
         for (let symbol in state.transitions) {
+            if (!state.transitions.hasOwnProperty(symbol)) continue;
+
             for (let target of state.transitions[symbol]) {
                 removeTransitionsMenu.push({
                     text: `σ({${state.name}}, ${symbol === '' ? 'λ' : symbol}) = {${target}}`,
@@ -382,6 +396,8 @@ cnv.oncontextmenu = function (e) {
 
         const renameTransitionsMenu = [];
         for (let symbol in state.transitions) {
+            if (!state.transitions.hasOwnProperty(symbol)) continue;
+
             for (let target of state.transitions[symbol]) {
                 renameTransitionsMenu.push({
                     text: `σ({${state.name}}, ${symbol === '' ? 'λ' : symbol}) = {${target}}`,

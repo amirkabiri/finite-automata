@@ -1,6 +1,7 @@
 ![demo](demo.png 'demo')
 
 # Finite Automata
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 this is a graphical interface for designing finite automata written in javascript
 
@@ -20,8 +21,14 @@ click [here](https://amirkabiri.github.io/finite-automata/index.html) to see onl
     -   [x] minimize dfa
 -   [x] export dfa as image
 -   [x] reset action to remove all states
--   [ ] convert dfa to grammar
--   [ ] create dfa from grammar
+-   [ ] grammar algorithms
+    -   [ ] convert dfa to grammar
+    -   [ ] create dfa from grammar
 -   [x] remove specific transition
 -   [ ] make drawing transitions better and more pretty
--   [ ] convert nfa to regular expressions
+-   [ ] regex algorithms
+    -   [x] convert finite automata to regular expressions
+    -   [ ] create finite automata from regular expressions
+    -   [x] convert regular expressions to machine-executable regex
+-   [x] test finite automata with a string
+

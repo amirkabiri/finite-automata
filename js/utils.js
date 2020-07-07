@@ -1,5 +1,6 @@
 /**
  * Get all states that has transition to state
+ * @param {FiniteAutomata} fa
  * @param {State} state destination state
  * @returns {Array} Array of states that has transition to state
  */
@@ -38,6 +39,12 @@ function getTerminalStates(fa) {
     return Object.values(fa.states).filter(state => state.terminal);
 }
 
+/**
+ * Creates canvas and returns canvas and context
+ * @param width
+ * @param height
+ * @return {(HTMLCanvasElement|CanvasRenderingContext2D)[]}
+ */
 function createCanvas(width = 320, height = 160) {
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -46,6 +53,10 @@ function createCanvas(width = 320, height = 160) {
     return [canvas, canvas.getContext('2d')];
 }
 
+/**
+ * Generates power set of array
+ * @param {array} l
+ */
 function powerset(l) {
     return (function ps(list) {
         if (list.length === 0) {
@@ -84,3 +95,12 @@ function iterableObject(object) {
 
 window.$ = (...q) => document.querySelector(...q);
 window.$$ = (...q) => document.querySelectorAll(...q);
+
+function handleError(e) {
+    if (e instanceof CustomError) {
+        alert(e.message);
+    } else {
+        alert('unexpected error occurred. report us on github issues');
+        console.log(e);
+    }
+}
