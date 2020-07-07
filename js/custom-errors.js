@@ -69,3 +69,8 @@ class InvalidTuringMachineError extends CustomError {
         super(message);
     }
 }
+class NotDPDAError extends CustomError {
+    constructor(message = 'pda is not deterministic (DPDA)') {
+        super(message);
+    }
+}
