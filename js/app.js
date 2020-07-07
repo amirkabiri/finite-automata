@@ -25,7 +25,7 @@ render();
 
 $('#test').onclick = function () {
     try {
-        const nfa2reConverter = new convertNFA2RE(fa);
+        const nfa2reConverter = new convert2RE(fa);
         const resFA = nfa2reConverter.run();
         let { transitions } = resFA.states[resFA.start];
         let symbol;
