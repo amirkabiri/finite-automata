@@ -1,4 +1,4 @@
-class convertNFA2RE {
+class convert2RE {
     constructor(fa) {
         if (fa.start === null || !Object.keys(fa.states).includes(fa.start)) {
             throw new NoStartPointError();
@@ -16,14 +16,17 @@ class convertNFA2RE {
     }
 
     /**
-     * Converts a NFA to RegularExpression in three steps:
+     * Converts a FA to RegularExpression in three steps:
      *
      * Step 1:
-     *  Add new start state and make a λ transition to former start states
+     *  Remove trap state if it exists (if fa is deterministic)
      *
      * Step 2:
-     *  Add new terminal state and make λ transitions from all terminal states to new terminal state
-     *  and make all terminal states to non-terminal states except new terminal states
+     *  A:
+     *      Add new start state and make a λ transition to former start states
+     *  B:
+     *      Add new terminal state and make λ transitions from all terminal states to new terminal state
+     *      and make all terminal states to non-terminal states except new terminal states
      *
      * Step 3:
      *  While count fa's states is greater than 2 repeat :
@@ -36,6 +39,11 @@ class convertNFA2RE {
         const { fa } = this;
 
         // Step 1
+        if (Object.values(fa.states).some(state => state.name.trim() === '')) {
+            fa.removeState('');
+        }
+
+        // Step 2
         let newStartState = {
             name: 'λ',
             x: 0,
@@ -47,7 +55,6 @@ class convertNFA2RE {
         fa.addState(newStartState);
         fa.start = newStartState.name;
 
-        // Step 2
         let newTerminalState = {
             name: 'λ' + Object.keys(fa.states).length,
             x: 20,
@@ -55,7 +62,7 @@ class convertNFA2RE {
             terminal: true,
         };
 
-        let terminalStates = getTerminalStates(fa);
+        let terminalStates = this.getTerminalStates(fa);
         terminalStates.forEach(state => {
             if (state.transitions[''] === undefined) {
                 state.transitions[''] = [newTerminalState.name];
@@ -71,7 +78,7 @@ class convertNFA2RE {
             let currentState = this.getNextState(fa);
 
             // states that has transition to current state
-            let statesHasTransitionToCurrentState = getStatesHasTransitionTo(fa, currentState);
+            let statesHasTransitionToCurrentState = this.getStatesHasTransitionTo(currentState);
 
             // symbol of transitions that goes
             // from current state to current state itself (symbol of star transition)
@@ -202,13 +209,71 @@ class convertNFA2RE {
     }
 
     /**
-     * Get next state for Step 3 of @see convertNFA2RE
+     * Get next state for Step 3 of @see convert2RE
      * @param {FiniteAutomata} fa
      * @returns {State}
      */
     getNextState(fa) {
-        for (const state of fa.states) {
-            if (fa.start !== state.name && !state.terminal) return state;
+        let result,
+            minTransitionCount = 0;
+        for (let name in fa.states) {
+            const state = fa.states[name];
+            if (!state || fa.start === name || state.terminal) {
+                continue;
+            }
+
+            let statesHasTransitionFromState = [];
+            for (let transitionName in state.transitions) {
+                const transition = state.transitions[transitionName];
+                if (transition === undefined) continue;
+                statesHasTransitionFromState = [...new Set(transition.concat(statesHasTransitionFromState))];
+            }
+            if (minTransitionCount == 0 || (statesHasTransitionFromState.length != 0 && statesHasTransitionFromState.length < minTransitionCount)) {
+                minTransitionCount = statesHasTransitionFromState.length;
+                result = state;
+            }
         }
+        return result;
+    }
+
+    /**
+     * Get all states that has transition to state
+     * @param {State} state destination state
+     * @returns {Array} Array of states that has transition to state
+     */
+    getStatesHasTransitionTo(state) {
+        const { fa } = this;
+        let result = [];
+
+        for (let originState of fa.states) {
+            if (this.isAnyTransitionBetween(originState, state)) {
+                result.push(originState);
+            }
+        }
+
+        return [...new Set(result)];
+    }
+
+    /**
+     * Check if there is any transition between two states
+     * @param {State} from Source state
+     * @param {State} to Destination state
+     *
+     * @returns {Boolean} Returns true if there is any transition otherwise returns false
+     */
+    isAnyTransitionBetween(from, to) {
+        for (let transition of Object.values(from.transitions)) {
+            if (transition.includes(to.name)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get all terminal states of fa
+     * @param {FiniteAutomata} fa
+     * @returns {Array} Array of terminal states
+     */
+    getTerminalStates(fa) {
+        return Object.values(fa.states).filter(state => state.terminal);
     }
 }

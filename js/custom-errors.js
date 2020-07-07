@@ -54,3 +54,23 @@ class AlreadyConvertedToREError extends CustomError {
         super(message);
     }
 }
+class GrammarIsNotCNFError extends CustomError {
+    constructor(message = 'grammar is not Chomsky Normal Form grammar') {
+        super(message);
+    }
+}
+class NonTerminalCharacterInWordError extends CustomError {
+    constructor(message = 'word contains non-terminal characters') {
+        super(message);
+    }
+}
+class InvalidTuringMachineError extends CustomError {
+    constructor(message = 'turing machine is invalid') {
+        super(message);
+    }
+}
+class NotDPDAError extends CustomError {
+    constructor(message = 'pda is not deterministic (DPDA)') {
+        super(message);
+    }
+}

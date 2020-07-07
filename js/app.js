@@ -25,7 +25,7 @@ render();
 
 $('#test').onclick = function () {
     try {
-        const nfa2reConverter = new convertNFA2RE(fa);
+        const nfa2reConverter = new convert2RE(fa);
         const resFA = nfa2reConverter.run();
         let { transitions } = resFA.states[resFA.start];
         let symbol;
@@ -108,9 +108,9 @@ $('#convert2dfa').onclick = () => {
     }
 };
 
-$('#convertnfa2re').onclick = () => {
+$('#convert2re').onclick = () => {
     try {
-        const converter = new convertNFA2RE(fa);
+        const converter = new convert2RE(fa);
         const resFA = converter.run();
         let { transitions } = resFA.states[resFA.start];
         let symbol;
@@ -243,8 +243,12 @@ function onTransitionRemoveClick(data) {
 
     if (symbol in state.transitions && state.transitions[symbol].includes(target)) {
         state.transitions[symbol] = state.transitions[symbol].filter(s => s !== target);
+        if (state.transitions[symbol].length === 0) {
+            delete state.transitions[symbol];
+        }
     }
 
+    save();
     render();
 }
 function onTransitionRenameClick(data) {
@@ -276,6 +280,7 @@ function onTransitionRenameClick(data) {
         }
     }
 
+    save();
     render();
 }
 cnv.oncontextmenu = function (e) {
