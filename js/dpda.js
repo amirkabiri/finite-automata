@@ -1,6 +1,6 @@
 class dpdaWordAcceptanceChekcer {
     constructor(word) {
-        if(!this.isDeterministic()) throw new NotDPDAError();
+        if (!this.isDeterministic()) throw new NotDPDAError();
         this.initialize(word);
     }
 
@@ -15,9 +15,67 @@ class dpdaWordAcceptanceChekcer {
         this.currentState = fa.states[fa.start];
     }
 
-    // TODO : Implementing the checking if the PDA is deterministic (DPDA)
     isDeterministic() {
-        return true
+        for (const { transitions } of fa.states) {
+            
+            // Removing '[' and ']' and useless spaces and push character form transition
+            // Before : '[a, b ,c ]'
+            // After : ['a', 'b']
+            let readAndPopCharTransitions = Object.keys(transitions).map(transition => {
+                let nomalizedTransition = transition
+                    .trim()
+                    .replace('[', '')
+                    .replace(']', '')
+                    .trim()
+                    .split(',')
+                    .map(character => character.trim());
+                return [nomalizedTransition[0], nomalizedTransition[1]];
+            });
+
+            // Check if there are transitions that goes to different states but
+            // has same read character and same pop character
+            if (
+                readAndPopCharTransitions.map(transition => transition.join(',')).length !==
+                [...new Set(readAndPopCharTransitions.map(transition => transition.join(',')))].length
+            ) {
+                return false;
+            }
+
+            // Check if there is a transitions that its read character is '' or 'λ' and
+            // its pop character is equal to the pop character of another transition
+            // like '[,charA,sth]' and '[sth,charA,sth]' so the charAs are equal and 'sth' can
+            // be anything but not '' or 'λ'
+            // if pda includes such transition it's non-deterministic
+            if (
+                readAndPopCharTransitions
+                    .filter(transition => transition[0] === '' || transition[0] === 'λ')
+                    .some(transition =>
+                        readAndPopCharTransitions
+                            .filter(transitionB => transitionB !== transition)
+                            .map(transitionB => transitionB[1])
+                            .includes(transition[1])
+                    )
+            ) {
+                return false;
+            }
+
+            for (const transition in transitions) {
+                let normalizedTransition = transition.trim().replace('[', '').replace(']', '').trim().split(',');
+
+                // Check if this transition
+                // is lambda transition or not ( lambda transition : '[,,,]' or '[λ,λ,λ]')
+                if (normalizedTransition.every(char => char.trim() === '' || char.trim() === 'λ')) {
+                    return false;
+                }
+
+                // Check if there is a transition that goes to different states
+                // with same characters
+                if (transitions[transition].length > 1) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
