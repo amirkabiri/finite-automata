@@ -82,7 +82,7 @@ $('#export-image').onclick = function () {
 
 $('#minimizedfa').onclick = () => {
     try {
-        fa = minimizeDFA(fa);
+        fa = new Minimizer(fa).run();
         render();
     } catch (e) {
         handleError(e);
