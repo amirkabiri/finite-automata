@@ -84,6 +84,7 @@ $('#minimizedfa').onclick = () => {
     try {
         fa = new Minimizer(fa).run();
         render();
+        alert('done!');
     } catch (e) {
         handleError(e);
     }
@@ -103,6 +104,7 @@ $('#convert2dfa').onclick = () => {
         fa = convertNFA2DFA(fa);
         fa = removeUselessStates(fa);
         render();
+        alert('done!');
     } catch (e) {
         handleError(e);
     }
