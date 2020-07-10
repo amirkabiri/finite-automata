@@ -150,7 +150,6 @@ class dpdaWordAcceptanceChekcer {
                     const char = pushChar[i];
                     this.stack.push(char);
                 }
-                console.log(this.stack);
             }
         }
 
