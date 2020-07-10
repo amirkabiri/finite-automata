@@ -146,10 +146,11 @@ class dpdaWordAcceptanceChekcer {
             if (pushChar.length < 2) {
                 this.stack.push(pushChar);
             } else {
-                for (let i = 0; i < pushChar.length; i++) {
+                for (let i = pushChar.length - 1; i >=0; i--) {
                     const char = pushChar[i];
                     this.stack.push(char);
                 }
+                console.log(this.stack);
             }
         }
 
