@@ -53,16 +53,6 @@ class Grammar{
     optimizeGrammar(grammar){
         if(!grammar) grammar = {};
 
-        // removing useless lambdas , example : A -> aλ
-        // result : A -> a
-        for(let variable in grammar){
-            grammar[variable] = grammar[variable].map(statement => {
-                if(statement.length === 1) return statement;
-
-                return statement.filter(e => e.value !== this.LAMBDA_SYMBOL);
-            });
-        }
-
         // if expressions is not instance of GrammarExpression class, create and insert new instance of this class
         for(let variable in grammar){
             if(! grammar.hasOwnProperty(variable)) continue;
@@ -100,6 +90,16 @@ class Grammar{
                     grammar[v] = grammar[v].filter(statement => statement.length);
                 }
             }
+        }
+
+        // removing useless lambdas , example : A -> aλ
+        // result : A -> a
+        for(let variable in grammar){
+            grammar[variable] = grammar[variable].map(statement => {
+                if(statement.length === 1) return statement;
+
+                return statement.filter(e => e.value !== this.LAMBDA_SYMBOL);
+            });
         }
 
         return grammar;
