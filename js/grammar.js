@@ -127,7 +127,7 @@ class Grammar{
             if(grammar[left] === undefined) grammar[left] = [];
             grammar[left] = grammar[left].concat(
                 right.split(SPLITTER_SYMBOL).map(
-                    item => item.trim().split('').map(
+                    item => item.trim().replace(/\s/g, '').split('').map(
                         value => new GrammarExpression(value)
                     )
                 )
