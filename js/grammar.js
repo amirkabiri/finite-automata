@@ -380,6 +380,8 @@ class Grammar{
         for(let i in variables){
             const variable = variables[i];
 
+            if(this.grammar[variable] === undefined) continue;
+
             out += variable + ' ' + this.EQUAL_SYMBOL + ' ';
             out += this.grammar[variable].map(statement => statement.map(expression => expression.value).join('')).join(' ' + this.SPLITTER_SYMBOL + ' ');
 
