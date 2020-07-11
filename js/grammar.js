@@ -118,7 +118,7 @@ class Grammar{
             let row = text[line].trim();
             if(!row.length) continue;
 
-            if(!row.includes(EQUAL_SYMBOL)) throw new Error('SyntaxError in line ' + line + ' : ' + EQUAL_SYMBOL + ' symbol not found');
+            if(!row.includes(EQUAL_SYMBOL)) throw new Error('SyntaxError in line ' + (+line + 1) + ' : ' + EQUAL_SYMBOL + ' symbol not found');
 
             const [left, right] = row.split(EQUAL_SYMBOL).map(item => item.trim());
 
