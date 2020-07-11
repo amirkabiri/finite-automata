@@ -702,7 +702,7 @@ class Grammar{
             }
         }
 
-        return new Grammar({ start, grammar });
+        return new Grammar({ start, grammar }).simplify();
     }
 
     /**
