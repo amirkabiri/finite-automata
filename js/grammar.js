@@ -634,10 +634,12 @@ class Grammar{
      * @return {Grammar}
      */
     toGNF(){
-        if(this.isGNF()) return this;
+        let self = this.simplify();
 
-        // simplification and removing left recursions
-        const self = this.simplify().removeLeftRecursions();
+        if(self.isGNF()) return self;
+
+        // removing left recursions
+        self = self.removeLeftRecursions();
 
         let start = self.start;
         let grammar = self.grammarDeepClone();
