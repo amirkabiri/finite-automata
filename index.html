@@ -47,6 +47,39 @@
                 <button data-key="move" class="active">move</button>
                 <button data-key="design">design</button>
             </div>
+            <button id="grammar-view">Grammar</button>
+        </div>
+
+        <div id="grammar">
+            <div id="grammar-close">×</div>
+            <div id="grammar-content">
+                <div class="col-6">
+                    <textarea placeholder="Enter grammar here ..." id="grammar-source"></textarea>
+                </div>
+                <div class="col-6">
+                    <div id="grammar-actions">
+                        <label>
+                            <input type="radio" name="grammar-action" value="chomsky">
+                            To Chomsky
+                        </label>
+                        <label>
+                            <input type="radio" name="grammar-action" value="greibach">
+                            To Greibach
+                        </label>
+                        <label>
+                            <input type="radio" name="grammar-action" value="simplify">
+                            Simplify
+                        </label>
+                        <label>
+                            <input type="radio" name="grammar-action" value="right-linear">
+                            To Right Linear
+                        </label>
+                    </div>
+                    <div id="grammar-result">
+                        Result  :
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="copyright">

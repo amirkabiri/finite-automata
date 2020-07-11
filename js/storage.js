@@ -37,3 +37,20 @@ function isFirstVisit() {
         return true;
     }
 }
+
+function saveGrammar(grammar){
+    try{
+        localStorage.grammar = grammar;
+
+        return true;
+    }catch (e) {
+        return false;
+    }
+}
+function loadGrammar() {
+    try {
+        return localStorage.grammar;
+    }catch (e) {
+        return undefined;
+    }
+}

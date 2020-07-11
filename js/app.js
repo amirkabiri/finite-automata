@@ -472,3 +472,50 @@ cnv.oncontextmenu = function (e) {
         });
     }
 };
+
+
+
+let grammarAction = '';
+$('#grammar-source').value = loadGrammar() ? loadGrammar() : '';
+
+$('#grammar-source').onkeyup = executeGrammarAction;
+$$('input[name="grammar-action"]').forEach(el => el.onchange = function(){
+    switch (this.value) {
+        case 'simplify':
+            grammarAction = 'simplify';
+            break;
+
+        case 'right-linear':
+            grammarAction = 'toRightLinear';
+            break;
+
+        case 'chomsky':
+            grammarAction = 'toCNF';
+            break;
+
+        case 'greibach':
+            grammarAction = 'toGNF';
+            break;
+    }
+    executeGrammarAction();
+});
+$('#grammar-view').onclick = () => $('#grammar').style.display = 'block';
+$('#grammar-close').onclick = () => $('#grammar').style.display = 'none';
+
+function executeGrammarAction(){
+    const grammarSource = $('#grammar-source').value;
+
+    saveGrammar(grammarSource);
+
+    if(!grammarAction) return;
+
+    try{
+        let grammar = new Grammar().parse(grammarSource);
+
+        grammar = grammar[grammarAction]();
+        $('#grammar-result').innerHTML = 'Result : <br><br>' + grammar.stringify().replace(/\n/g, '<br>');
+    }catch (e) {
+        console.log(e)
+        $('#grammar-result').innerHTML = e;
+    }
+}
